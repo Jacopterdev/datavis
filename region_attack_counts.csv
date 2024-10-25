@@ -1,0 +1,109 @@
+Region,AttackType,value
+Australasia & Oceania,Armed Assault,51
+Australasia & Oceania,Assassination,36
+Australasia & Oceania,Bombing/Explosion,75
+Australasia & Oceania,Facility/Infrastructure Attack,71
+Australasia & Oceania,Hijacking,3
+Australasia & Oceania,Hostage Taking (Barricade Incident),6
+Australasia & Oceania,Hostage Taking (Kidnapping),13
+Australasia & Oceania,Unarmed Assault,11
+Australasia & Oceania,Unknown,16
+Central America & Caribbean,Armed Assault,4361
+Central America & Caribbean,Assassination,1254
+Central America & Caribbean,Bombing/Explosion,3239
+Central America & Caribbean,Facility/Infrastructure Attack,403
+Central America & Caribbean,Hijacking,26
+Central America & Caribbean,Hostage Taking (Barricade Incident),187
+Central America & Caribbean,Hostage Taking (Kidnapping),501
+Central America & Caribbean,Unarmed Assault,19
+Central America & Caribbean,Unknown,354
+Central Asia,Armed Assault,116
+Central Asia,Assassination,115
+Central Asia,Bombing/Explosion,235
+Central Asia,Facility/Infrastructure Attack,20
+Central Asia,Hijacking,8
+Central Asia,Hostage Taking (Barricade Incident),2
+Central Asia,Hostage Taking (Kidnapping),45
+Central Asia,Unarmed Assault,5
+Central Asia,Unknown,17
+East Asia,Armed Assault,117
+East Asia,Assassination,55
+East Asia,Bombing/Explosion,330
+East Asia,Facility/Infrastructure Attack,200
+East Asia,Hijacking,18
+East Asia,Hostage Taking (Barricade Incident),3
+East Asia,Hostage Taking (Kidnapping),14
+East Asia,Unarmed Assault,42
+East Asia,Unknown,23
+Eastern Europe,Armed Assault,1274
+Eastern Europe,Assassination,400
+Eastern Europe,Bombing/Explosion,2766
+Eastern Europe,Facility/Infrastructure Attack,260
+Eastern Europe,Hijacking,26
+Eastern Europe,Hostage Taking (Barricade Incident),21
+Eastern Europe,Hostage Taking (Kidnapping),220
+Eastern Europe,Unarmed Assault,62
+Eastern Europe,Unknown,115
+Middle East & North Africa,Armed Assault,9273
+Middle East & North Africa,Assassination,4206
+Middle East & North Africa,Bombing/Explosion,30908
+Middle East & North Africa,Facility/Infrastructure Attack,1115
+Middle East & North Africa,Hijacking,138
+Middle East & North Africa,Hostage Taking (Barricade Incident),100
+Middle East & North Africa,Hostage Taking (Kidnapping),2666
+Middle East & North Africa,Unarmed Assault,177
+Middle East & North Africa,Unknown,1891
+North America,Armed Assault,448
+North America,Assassination,255
+North America,Bombing/Explosion,1534
+North America,Facility/Infrastructure Attack,906
+North America,Hijacking,18
+North America,Hostage Taking (Barricade Incident),67
+North America,Hostage Taking (Kidnapping),123
+North America,Unarmed Assault,73
+North America,Unknown,32
+South America,Armed Assault,3875
+South America,Assassination,2745
+South America,Bombing/Explosion,9039
+South America,Facility/Infrastructure Attack,803
+South America,Hijacking,67
+South America,Hostage Taking (Barricade Incident),234
+South America,Hostage Taking (Kidnapping),1414
+South America,Unarmed Assault,47
+South America,Unknown,754
+South Asia,Armed Assault,11404
+South Asia,Assassination,4301
+South Asia,Bombing/Explosion,21246
+South Asia,Facility/Infrastructure Attack,2189
+South Asia,Hijacking,93
+South Asia,Hostage Taking (Barricade Incident),120
+South Asia,Hostage Taking (Kidnapping),3277
+South Asia,Unarmed Assault,323
+South Asia,Unknown,2021
+Southeast Asia,Armed Assault,4022
+Southeast Asia,Assassination,1369
+Southeast Asia,Bombing/Explosion,4818
+Southeast Asia,Facility/Infrastructure Attack,948
+Southeast Asia,Hijacking,59
+Southeast Asia,Hostage Taking (Barricade Incident),67
+Southeast Asia,Hostage Taking (Kidnapping),744
+Southeast Asia,Unarmed Assault,25
+Southeast Asia,Unknown,433
+Sub-Saharan Africa,Armed Assault,6004
+Sub-Saharan Africa,Assassination,1638
+Sub-Saharan Africa,Bombing/Explosion,5557
+Sub-Saharan Africa,Facility/Infrastructure Attack,810
+Sub-Saharan Africa,Hijacking,136
+Sub-Saharan Africa,Hostage Taking (Barricade Incident),95
+Sub-Saharan Africa,Hostage Taking (Kidnapping),1872
+Sub-Saharan Africa,Unarmed Assault,83
+Sub-Saharan Africa,Unknown,1355
+Western Europe,Armed Assault,1724
+Western Europe,Assassination,2938
+Western Europe,Bombing/Explosion,8508
+Western Europe,Facility/Infrastructure Attack,2631
+Western Europe,Hijacking,67
+Western Europe,Hostage Taking (Barricade Incident),89
+Western Europe,Hostage Taking (Kidnapping),269
+Western Europe,Unarmed Assault,148
+Western Europe,Unknown,265
