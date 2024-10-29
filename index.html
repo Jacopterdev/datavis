@@ -8,12 +8,20 @@
     <script src="https://unpkg.com/d3-path@1"></script>
     <script src="https://unpkg.com/d3-shape@1"></script>
     <script src="https://unpkg.com/d3-sankey@0"></script>
-	<script src="sankey2.js"></script>
+	<script src="datahandler.js"></script>
 
 	<link rel="stylesheet" href="style.css">
 	<title>D3 Sankey</title>
 </head>
 <body>
     <h1>My first ever sankey diagram :&#41;</h1>
+    <div id="controls">
+        <label for="column1">Select Column 1:</label>
+        <select id="column1"></select>
+        <label for="column2">Select Column 2:</label>
+        <select id="column2"></select>
+        <button id="update">Update Chart</button>
+      </div>
+      <div id="chart"></div>
 </body>
 </html>
