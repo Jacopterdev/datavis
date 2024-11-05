@@ -103,7 +103,7 @@ function updateChart(data, col1, col2, link){
 
       const sankey = d3.sankey()
         .nodeSort((a, b) => d3.descending(a.value, b.value))
-        .linkSort((a, b) => d3.descending(a.value, b.value))
+        .linkSort(null)
         .nodeWidth(4)
         .nodePadding(20)
         .extent([[0, 5], [width, height - 5]]);
@@ -168,31 +168,42 @@ function updateChart(data, col1, col2, link){
         .text(d => ` ${d.value.toLocaleString()}`);
 }
 
-// Function to get top N categories by count
+// Function to get top N categories by count along with counts
 function getTopCategories(data, col, topN = 12) {
-    const counts = {};
+  const counts = {};
 
-    data.forEach(row => {
-      if (!counts[row[col]]) {
-        counts[row[col]] = 0;
-      }
-      counts[row[col]]++;
-    });
+  data.forEach(row => {
+    if (!counts[row[col]]) {
+      counts[row[col]] = 0;
+    }
+    counts[row[col]]++;
+  });
 
-    return Object.entries(counts)
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, topN)
-      .map(d => d[0]);
-  }
+  const sortedCounts = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+  const topCategories = sortedCounts.slice(0, topN).map(d => d[0]);
 
-  // Function to filter data by top N categories
-  function filterByTopCategories(data, col1, col2, topN = 12) {
-    const topCol1 = getTopCategories(data, col1, topN);
-    const topCol2 = getTopCategories(data, col2, topN);
+  return { topCategories, counts };
+}
 
-    return data.filter(row => topCol1.includes(row[col1]) && topCol2.includes(row[col2]));
-  }
+// Function to categorize data and group non-top categories as 'Other'
+function categorizeData(data, col1, col2, topN = 12) {
+  const { topCategories: topCol1, counts: countsCol1 } = getTopCategories(data, col1, topN);
+  const { topCategories: topCol2, counts: countsCol2 } = getTopCategories(data, col2, topN);
 
+  return data.map(row => {
+    const newRow = { ...row };
+
+    if (!topCol1.includes(row[col1])) {
+      newRow[col1] = 'Other';
+    }
+
+    if (!topCol2.includes(row[col2])) {
+      newRow[col2] = 'Other';
+    }
+
+    return newRow;
+  });
+}
 
 
 // Load the data
