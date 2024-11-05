@@ -5,6 +5,9 @@ const categoricalColumns = [
     "Deadly", "AnyCasualties"
   ];
 
+// List of quantifiable columns
+const quantifiableColumns = ['Incidents', 'Killed', 'Wounded', 'Casualties'];
+
 // Function to group and count combinations
 function groupAndCount(data, col1, col2) {
     const groupedData = {};
@@ -19,6 +22,25 @@ function groupAndCount(data, col1, col2) {
 
     return Object.values(groupedData);
   }
+
+// Function to group and either count rows or sum specific columns
+function groupAndAggregate(data, col1, col2, operation, sumCol) {
+  const groupedData = {};
+
+  data.forEach(row => {
+    const key = `${row[col1]}|${row[col2]}`;
+    if (!groupedData[key]) {
+      groupedData[key] = { [col1]: row[col1], [col2]: row[col2], Count: 0 };
+    }
+    if (operation === 'count') {
+      groupedData[key].Count++;
+    } else if (operation === 'sum') {
+      groupedData[key].Count += row[sumCol] || 0; // Ensure the value exists and is a number
+    }
+  });
+
+  return Object.values(groupedData);
+}
 
 // Function to prepare data for the Sankey diagram
 function prepareSankeyData(data, col1, col2) {
@@ -63,9 +85,17 @@ function prepareSankeyData(data, col1, col2) {
     return { nodes, links };
 }
 
-function updateChart(data, col1, col2){
+function updateChart(data, col1, col2, link){
     const filteredData = filterByTopCategories(data, col1, col2);
-    const groupedData = groupAndCount(filteredData, col1, col2);
+
+    // Group and count depending on the link/quantifiable data type
+    let groupedData;
+    if(link === 'Incidents'){
+      groupedData = groupAndAggregate(filteredData, col1, col2, 'count');
+    } else {
+      groupedData = groupAndAggregate(filteredData, col1, col2, 'sum', link);
+    }
+    
       const sankeyData = prepareSankeyData(groupedData, col1, col2);
 
       const width = 928;
@@ -173,10 +203,15 @@ d3.csv("terror_cleaned.csv", d3.autoType).then(data => {
     // Populate dropdowns
     const select1 = d3.select("#column1");
     const select2 = d3.select("#column2");
+    const selectLink = d3.select("#link");
 
     categoricalColumns.forEach(column => {
       select1.append("option").text(column).attr("value", column);
       select2.append("option").text(column).attr("value", column);
+    });
+
+    quantifiableColumns.forEach(column => {
+      selectLink.append("option").text(column).attr("value", column);
     });
 
     // Set default selections
@@ -184,15 +219,18 @@ d3.csv("terror_cleaned.csv", d3.autoType).then(data => {
       select1.property("value", categoricalColumns[2]);
       select2.property("value", categoricalColumns[4] || categoricalColumns[2]);
 
+      selectLink.property("value", quantifiableColumns[0]);
+
       // Add event listener to update button
       d3.select("#update").on("click", () => {
         const col1 = select1.property("value");
         const col2 = select2.property("value");
-        updateChart(dataset, col1, col2);
+        const link = selectLink.property("value");
+        updateChart(dataset, col1, col2, link);
       });
 
       // Initial chart
-      updateChart(dataset, categoricalColumns[2], categoricalColumns[4] || categoricalColumns[2]);
+      updateChart(dataset, categoricalColumns[2], categoricalColumns[4] || categoricalColumns[2], quantifiableColumns[0]);
     } else {
       console.error("No categorical columns found in the dataset.");
     }
