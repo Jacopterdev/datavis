@@ -3,7 +3,7 @@ const categoricalColumns = [
     "Month", "Country", "Region", "city", "AttackType", 
     "Target", "Group", "Target_type", "Weapon_type", 
     "Deadly", "AnyCasualties"
-  ];
+];
 
 // List of quantifiable columns
 const quantifiableColumns = ['Incidents', 'Killed', 'Wounded', 'Casualties'];
@@ -13,21 +13,6 @@ const height = 720;
 
 let svg;
 let sankey;
-
-// // Create SVG
-// const svg = d3.select("#chart")
-// .append("svg")
-// .attr("viewBox", [0, 0, width, height])
-// .attr("width", width)
-// .attr("height", height)
-// .attr("style", "max-width: 100%; height: auto;");
-
-// const sankey = d3.sankey()
-//   .nodeSort((a, b) => d3.descending(a.value, b.value))
-//   .linkSort(null)
-//   .nodeWidth(40)
-//   .nodePadding(20)
-//   .extent([[0, 5], [width, height - 5]]);
 
 let graph = null;  // Store the current graph data
 
@@ -130,12 +115,7 @@ function updateChart(data, col1, col2, linkAttr) {
   renderSankey(groupedData, col1, col2);
 }
 
-
 function renderSankey(data, col1, col2) {
-
-  
-
-
   // Convert to Sankey data
   const graph = prepareSankeyData(data, col1, col2);
 
@@ -179,7 +159,8 @@ function renderSankey(data, col1, col2) {
     .attr("x", d => d.x0)
     .attr("y", d => d.y0)
     .attr("height", d => d.y1 - d.y0)
-    .attr("width", d => d.x1 - d.x0);
+    .attr("width", d => d.x1 - d.x0)
+    .attr("fill", d => color(d.name));
 
   node.select("title")
     .text(d => `${d.name}\n${d.value.toLocaleString()}`);
@@ -197,6 +178,8 @@ function renderSankey(data, col1, col2) {
     .attr("d", d3.sankeyLinkHorizontal())
     .attr("stroke", d => color(d.names[1]))
     .attr("stroke-width", d => Math.max(1, d.width))
+    .attr("stroke-opacity", 0.7)
+    .attr("fill", "none")
     .style("mix-blend-mode", "multiply");
 
   linkEnter.append("title")
@@ -280,7 +263,6 @@ function categorizeData(data, col1, col2, topN = 12) {
     return newRow;
   });
 }
-
 
 // Load the data
 d3.csv("terror_cleaned.csv", d3.autoType).then(data => {
