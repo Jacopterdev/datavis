@@ -8,6 +8,29 @@ const categoricalColumns = [
 // List of quantifiable columns
 const quantifiableColumns = ['Incidents', 'Killed', 'Wounded', 'Casualties'];
 
+const width = 928;
+const height = 720;
+
+let svg;
+let sankey;
+
+// // Create SVG
+// const svg = d3.select("#chart")
+// .append("svg")
+// .attr("viewBox", [0, 0, width, height])
+// .attr("width", width)
+// .attr("height", height)
+// .attr("style", "max-width: 100%; height: auto;");
+
+// const sankey = d3.sankey()
+//   .nodeSort((a, b) => d3.descending(a.value, b.value))
+//   .linkSort(null)
+//   .nodeWidth(40)
+//   .nodePadding(20)
+//   .extent([[0, 5], [width, height - 5]]);
+
+let graph = null;  // Store the current graph data
+
 // Function to group and either count rows or sum specific columns
 function groupAndAggregate(data, col1, col2, operation, sumCol) {
   const groupedData = {};
@@ -81,76 +104,144 @@ function updateChart(data, col1, col2, linkAttr) {
     groupedData = groupAndAggregate(filteredData, col1, col2, 'sum', linkAttr);
   }
 
-  const sankeyData = prepareSankeyData(groupedData, col1, col2);
-
   const width = 928;
   const height = 720;
-
-  const sankey = d3.sankey()
-    .nodeSort((a, b) => d3.descending(a.value, b.value))
-    .linkSort(null)
-    .nodeWidth(40)
-    .nodePadding(20)
-    .extent([[0, 5], [width, height - 5]]);
-
-  const attackTypes = Array.from(new Set(data.map(d => d[col2])));
-  const color = d3.scaleOrdinal()
-    .domain(attackTypes)
-    .range(d3.schemeCategory10)
-    .unknown("#ccc");
 
   // Remove any existing SVG
   d3.select("#chart").selectAll("*").remove();
 
   // Create SVG
-  const svg = d3.select("#chart")
+  svg = d3.select("#chart")
     .append("svg")
     .attr("viewBox", [0, 0, width, height])
     .attr("width", width)
     .attr("height", height)
     .attr("style", "max-width: 100%; height: auto;");
 
+  sankey = d3.sankey()
+    .nodeSort((a, b) => d3.descending(a.value, b.value))
+    .linkSort(null)
+    .nodeWidth(40)
+    .nodePadding(20)
+    .extent([[0, 5], [width, height - 5]]);
+
+
+  graph = prepareSankeyData(groupedData, col1, col2);
+  renderSankey(groupedData, col1, col2);
+}
+
+
+function renderSankey(data, col1, col2) {
+
+  
+
+
+  // Convert to Sankey data
+  const graph = prepareSankeyData(data, col1, col2);
+
+  console.log("Sankey data:", graph);
+
+  // Extract rows for color coding
+  const col2Rows = Array.from(new Set(data.map(d => d[col2])));
+  const color = d3.scaleOrdinal()
+    .domain(col2Rows)
+    .range(d3.schemeCategory10)
+    .unknown("#ccc");
+
   const { nodes, links } = sankey({
-    nodes: sankeyData.nodes.map(d => Object.create(d)),
-    links: sankeyData.links.map(d => Object.create(d))
+    nodes: graph.nodes.map(d => Object.create(d)),
+    links: graph.links.map(d => Object.create(d))
   });
 
-  svg.append("g")
-    .selectAll("rect")
-    .data(nodes)
-    .join("rect")
+  console.log("Rendered nodes:", nodes);
+  console.log("Rendered links:", links);
+
+  // Bind data to nodes
+  const node = svg.selectAll(".node")
+    .data(nodes, d => d.name);
+
+  // Enter new nodes
+  const nodeEnter = node.enter().append("g")
+    .attr("class", "node");
+
+  nodeEnter.append("rect")
     .attr("x", d => d.x0)
     .attr("y", d => d.y0)
     .attr("height", d => d.y1 - d.y0)
     .attr("width", d => d.x1 - d.x0)
-    .append("title")
+    .attr("fill", d => color(d.name));
+
+  nodeEnter.append("title")
     .text(d => `${d.name}\n${d.value.toLocaleString()}`);
 
-  svg.append("g")
-    .attr("fill", "none")
-    .selectAll("g")
-    .data(links)
-    .join("path")
+  // Update existing nodes
+  node.select("rect")
+    .attr("x", d => d.x0)
+    .attr("y", d => d.y0)
+    .attr("height", d => d.y1 - d.y0)
+    .attr("width", d => d.x1 - d.x0);
+
+  node.select("title")
+    .text(d => `${d.name}\n${d.value.toLocaleString()}`);
+
+  // Remove old nodes
+  node.exit().remove();
+
+  // Bind data to links
+  const link = svg.selectAll(".link")
+    .data(links, d => `${d.source.name}-${d.target.name}`);
+
+  // Enter new links
+  const linkEnter = link.enter().append("path")
+    .attr("class", "link")
     .attr("d", d3.sankeyLinkHorizontal())
     .attr("stroke", d => color(d.names[1]))
-    .attr("stroke-width", d => d.width)
-    .style("mix-blend-mode", "multiply")
-    .append("title")
+    .attr("stroke-width", d => Math.max(1, d.width))
+    .style("mix-blend-mode", "multiply");
+
+  linkEnter.append("title")
     .text(d => `${d.names.join(" → ")}\n${d.value.toLocaleString()}`);
 
-  svg.append("g")
-    .style("font", "10px sans-serif")
-    .selectAll("text")
-    .data(nodes)
-    .join("text")
+  // Update existing links
+  link.attr("d", d3.sankeyLinkHorizontal())
+    .attr("stroke", d => color(d.names[1]))
+    .attr("stroke-width", d => Math.max(1, d.width));
+
+  link.select("title")
+    .text(d => `${d.names.join(" → ")}\n${d.value.toLocaleString()}`);
+
+  // Remove old links
+  link.exit().remove();
+
+  // Bind data to node labels
+  const label = svg.selectAll(".label")
+    .data(nodes, d => d.name);
+
+  // Enter new labels
+  const labelEnter = label.enter().append("text")
+    .attr("class", "label")
     .attr("x", d => d.x0 < width / 2 ? d.x1 + 6 : d.x0 - 6)
     .attr("y", d => (d.y1 + d.y0) / 2)
     .attr("dy", "0.35em")
     .attr("text-anchor", d => d.x0 < width / 2 ? "start" : "end")
-    .text(d => d.name)
-    .append("tspan")
+    .text(d => d.name);
+
+  labelEnter.append("tspan")
     .attr("fill-opacity", 0.7)
     .text(d => ` ${d.value.toLocaleString()}`);
+
+  // Update existing labels
+  label.attr("x", d => d.x0 < width / 2 ? d.x1 + 6 : d.x0 - 6)
+    .attr("y", d => (d.y1 + d.y0) / 2)
+    .attr("dy", "0.35em")
+    .attr("text-anchor", d => d.x0 < width / 2 ? "start" : "end")
+    .text(d => d.name)
+    .select("tspan")
+    .attr("fill-opacity", 0.7)
+    .text(d => ` ${d.value.toLocaleString()}`);
+
+  // Remove old labels
+  label.exit().remove();
 }
 
 // Function to get top N categories by count along with counts
