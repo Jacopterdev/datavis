@@ -111,13 +111,13 @@ function updateChart(data, col1, col2, linkAttr) {
     .extent([[0, 5], [width, height - 5]]);
 
 
-  graph = prepareSankeyData(groupedData, col1, col2);
+  //graph = prepareSankeyData(groupedData, col1, col2);
   renderSankey(groupedData, col1, col2);
 }
 
 function renderSankey(data, col1, col2) {
   // Convert to Sankey data
-  const graph = prepareSankeyData(data, col1, col2);
+  graph = prepareSankeyData(data, col1, col2);
 
   console.log("Sankey data:", graph);
 
@@ -142,7 +142,10 @@ function renderSankey(data, col1, col2) {
 
   // Enter new nodes
   const nodeEnter = node.enter().append("g")
-    .attr("class", "node");
+    .attr("class", "node")
+    .on("click", function(event, d) {
+      handleNodeClick(d, data, col1, col2);
+    });
 
   nodeEnter.append("rect")
     .attr("x", d => d.x0)
@@ -242,6 +245,14 @@ function getTopCategories(data, col, topN = 12) {
   const topCategories = sortedCounts.slice(0, topN).map(d => d[0]);
 
   return { topCategories, counts };
+}
+
+function handleNodeClick(clickedNode, dataset, col1, col2) {
+  // Remove clicked node from data
+  newDataset = dataset.filter(row => row[col1] !== clickedNode.name && row[col2] !== clickedNode.name);
+
+  // Re-render the Sankey diagram with updated data
+  updateChart(newDataset, col1, col2);
 }
 
 // Function to categorize data and group non-top categories as 'Other'
