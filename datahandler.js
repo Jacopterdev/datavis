@@ -1,4 +1,7 @@
 let dataset;
+
+let graph = null;  // Store the current graph data
+
 const categoricalColumns = [
     "Month", "Country", "Region", "city", "AttackType", 
     "Target", "Group", "Target_type", "Weapon_type", 
@@ -14,7 +17,7 @@ const height = 720;
 let svg;
 let sankey;
 
-let graph = null;  // Store the current graph data
+
 
 // Function to group and either count rows or sum specific columns
 function groupAndAggregate(data, col1, col2, operation, sumCol) {
@@ -144,7 +147,7 @@ function renderSankey(data, col1, col2) {
   const nodeEnter = node.enter().append("g")
     .attr("class", "node")
     .on("click", function(event, d) {
-      handleNodeClick(d, data, col1, col2);
+      handleNodeClick(d, col1, col2);
     });
 
   nodeEnter.append("rect")
@@ -158,7 +161,7 @@ function renderSankey(data, col1, col2) {
     .text(d => `${d.name}\n${d.value.toLocaleString()}`);
 
   // Update existing nodes
-  node.select("rect")
+  node.select("rect").transition().duration(750)
     .attr("x", d => d.x0)
     .attr("y", d => d.y0)
     .attr("height", d => d.y1 - d.y0)
@@ -169,7 +172,9 @@ function renderSankey(data, col1, col2) {
     .text(d => `${d.name}\n${d.value.toLocaleString()}`);
 
   // Remove old nodes
-  node.exit().remove();
+  node.exit().transition().duration(750)
+  .attr("opacity", 0)
+  .remove();
 
   // Bind data to links
   const link = svg.selectAll(".link")
@@ -189,7 +194,8 @@ function renderSankey(data, col1, col2) {
     .text(d => `${d.names.join(" → ")}\n${d.value.toLocaleString()}`);
 
   // Update existing links
-  link.attr("d", d3.sankeyLinkHorizontal())
+  link.transition().duration(750)
+    .attr("d", d3.sankeyLinkHorizontal())
     .attr("stroke", d => color(d.names[1]))
     .attr("stroke-width", d => Math.max(1, d.width));
 
@@ -197,7 +203,9 @@ function renderSankey(data, col1, col2) {
     .text(d => `${d.names.join(" → ")}\n${d.value.toLocaleString()}`);
 
   // Remove old links
-  link.exit().remove();
+  link.exit().transition().duration(750)
+    .attr("opacity", 0)
+    .remove();
 
   // Bind data to node labels
   const label = svg.selectAll(".label")
@@ -217,7 +225,8 @@ function renderSankey(data, col1, col2) {
     .text(d => ` ${d.value.toLocaleString()}`);
 
   // Update existing labels
-  label.attr("x", d => d.x0 < width / 2 ? d.x1 + 6 : d.x0 - 6)
+  label.transition().duration(750)
+    .attr("x", d => d.x0 < width / 2 ? d.x1 + 6 : d.x0 - 6)
     .attr("y", d => (d.y1 + d.y0) / 2)
     .attr("dy", "0.35em")
     .attr("text-anchor", d => d.x0 < width / 2 ? "start" : "end")
@@ -227,7 +236,9 @@ function renderSankey(data, col1, col2) {
     .text(d => ` ${d.value.toLocaleString()}`);
 
   // Remove old labels
-  label.exit().remove();
+  label.exit().transition().duration(750)
+    .attr("opacity", 0)
+    .remove();
 }
 
 // Function to get top N categories by count along with counts
@@ -247,12 +258,13 @@ function getTopCategories(data, col, topN = 12) {
   return { topCategories, counts };
 }
 
-function handleNodeClick(clickedNode, dataset, col1, col2) {
+function handleNodeClick(clickedNode, col1, col2) {
   // Remove clicked node from data
-  newDataset = dataset.filter(row => row[col1] !== clickedNode.name && row[col2] !== clickedNode.name);
+  const newDataset = dataset.filter(row => row[col1] !== clickedNode.name && row[col2] !== clickedNode.name);
 
+  dataset = newDataset;
   // Re-render the Sankey diagram with updated data
-  updateChart(newDataset, col1, col2);
+  renderSankey(newDataset, col1, col2);
 }
 
 // Function to categorize data and group non-top categories as 'Other'
@@ -278,6 +290,8 @@ function categorizeData(data, col1, col2, topN = 12) {
 // Load the data
 d3.csv("terror_cleaned.csv", d3.autoType).then(data => {
     dataset = data;
+    const originalDataset = dataset;
+
     console.log("Data loaded:", data);
 
     // Populate dropdowns
@@ -306,6 +320,7 @@ d3.csv("terror_cleaned.csv", d3.autoType).then(data => {
         const col1 = select1.property("value");
         const col2 = select2.property("value");
         const linkAttr = selectLink.property("value");
+        dataset = originalDataset;
         updateChart(dataset, col1, col2, linkAttr);
       });
 
