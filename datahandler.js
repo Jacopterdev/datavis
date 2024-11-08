@@ -317,8 +317,7 @@ function reduceToTopN(data, topN = 4, includeOther = false) {
   });
 }
 
-// Function to add a node to the specified column (either col1 or col2)
-function addNodeToColumn(column, key) {
+function addNodeToColumn(column, key, otherKey) {
   const inputId = `node${column.charAt(0).toUpperCase() + column.slice(1)}`;  // Dynamically get input ID
   const buttonId = `add${column.charAt(0).toUpperCase() + column.slice(1)}Button`; // Dynamically get button ID
 
@@ -332,7 +331,11 @@ function addNodeToColumn(column, key) {
           // Trim spaces and handle case insensitivity
           const dataValue = d[key]?.toLowerCase().trim();
           const inputValue = value.toLowerCase();
-          return dataValue === inputValue;
+
+          // Check if the otherKey exists in the dataset
+          const otherKeyExists = dataset.some(existingNode => existingNode[otherKey] === d[otherKey]);
+
+          return dataValue === inputValue && otherKeyExists;
       });  // Find nodes by column value
       console.log(`Searching for '${value}' in ${key} within groupedData...`);
       console.log(groupedData);
@@ -342,14 +345,12 @@ function addNodeToColumn(column, key) {
 
           // Check if the nodes already exist in the dataset
           const nodeExists = nodesToReAdd.some(d => dataset.some(existingNode => existingNode[key] === d[key]));
-          //const nodeExists = false;
           console.log(`Do any of the nodes already exist in dataset?: ${nodeExists}`);  // Debugging: check if nodes exist in dataset
 
           if (!nodeExists) {
               // Add all the found nodes back to dataset
               dataset.push(...nodesToReAdd);
               console.log(`Nodes added to dataset. Re-rendering Sankey diagram...`);
-              //dataset = reduceToTopN(nodesToReAdd);
               renderSankey(dataset, col1, col2);  // Re-render the Sankey diagram with updated data
           } else {
               alert("Node(s) already exist in the dataset.");
@@ -404,13 +405,13 @@ d3.csv("terror_cleaned.csv", d3.autoType).then(data => {
       // Handle click event for adding a node to col1
       document.getElementById('addCol1Button').addEventListener('click', function () {
         const col1 = select1.property("value");
-        addNodeToColumn('col1', col1);  // Call function to add to col1
+        addNodeToColumn('col1', col1, col2);  // Call function to add to col1
       });
 
       // Handle click event for adding a node to col2
       document.getElementById('addCol2Button').addEventListener('click', function () {
         const col2 = select2.property("value");
-        addNodeToColumn('col2', col2);  // Call function to add to col2
+        addNodeToColumn('col2', col2, col1);  // Call function to add to col2
       });
 
       // Initial chart
