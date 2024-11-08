@@ -1,3 +1,19 @@
+
+//
+// originalData --> The entire dataset for preliminary filters
+// |
+// | (is defined as const when the dataset is loaded)
+// |
+// groupedData --> The filtered dataset with all elements for selections
+// |
+// | (Should be able to add and remove between these two when interacting with the graph)
+// |
+// dataset & graph --> The current, visible and selected data
+//
+
+
+let groupedData;
+
 let dataset;
 
 let graph = null;  // Store the current graph data
@@ -85,7 +101,6 @@ function updateChart(data, col1, col2, linkAttr) {
   const filteredData = categorizeData(data, col1, col2);
 
   // Group and count depending on the link/quantifiable data type
-  let groupedData;
   if (linkAttr === 'Incidents') {
     groupedData = groupAndAggregate(filteredData, col1, col2, 'count');
   } else {
