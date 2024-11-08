@@ -106,13 +106,13 @@ function updateChart(data, newCol1, newCol2, linkAttr) {
   col1 = newCol1;
   col2 = newCol2;
 
-  const filteredData = categorizeData(data);
+  
 
   // Group and count depending on the link/quantifiable data type
   if (linkAttr === 'Incidents') {
-    groupedData = groupAndAggregate(filteredData, 'count');
+    groupedData = groupAndAggregate(data, 'count');
   } else {
-    groupedData = groupAndAggregate(filteredData, 'sum', linkAttr);
+    groupedData = groupAndAggregate(data, 'sum', linkAttr);
   }
 
   const width = 928;
@@ -136,8 +136,9 @@ function updateChart(data, newCol1, newCol2, linkAttr) {
     .nodePadding(20)
     .extent([[0, 5], [width, height - 5]]);
 
-  console.log(groupedData);
-  renderSankey(groupedData);
+
+  dataset = reduceToTopN(groupedData);
+  renderSankey(dataset);
   
 }
 
@@ -265,7 +266,7 @@ function renderSankey(data) {
 }
 
 // Function to get top N categories by count along with counts
-function getTopCategories(data, col, topN = 12) {
+function getTopCategories(data, col, topN = 4) {
   const counts = {};
 
   data.forEach(row => {
@@ -290,23 +291,29 @@ function handleNodeClick(clickedNode) {
   renderSankey(dataset, col1, col2);
 }
 
-// Function to categorize data and group non-top categories as 'Other'
-function categorizeData(data, topN = 12) {
+// Function to categorize data and group non-top categories as 'Other' based on the includeOther flag
+function reduceToTopN(data, topN = 4, includeOther = false) {
   const { topCategories: topCol1, counts: countsCol1 } = getTopCategories(data, col1, topN);
   const { topCategories: topCol2, counts: countsCol2 } = getTopCategories(data, col2, topN);
 
-  return data.map(row => {
+  return data.filter(row => {
     const newRow = { ...row };
 
-    if (!topCol1.includes(row[col1])) {
-      newRow[col1] = 'Other';
+    // If 'includeOther' is true, categorize non-top values as "Other"
+    if (includeOther) {
+      if (!topCol1.includes(row[col1])) {
+        newRow[col1] = 'Other';
+      }
+
+      if (!topCol2.includes(row[col2])) {
+        newRow[col2] = 'Other';
+      }
+
+      return true; // Keep the row with 'Other' values
     }
 
-    if (!topCol2.includes(row[col2])) {
-      newRow[col2] = 'Other';
-    }
-
-    return newRow;
+    // If 'includeOther' is false, only keep rows that belong to the top categories
+    return topCol1.includes(row[col1]) && topCol2.includes(row[col2]);
   });
 }
 
@@ -334,15 +341,15 @@ function addNodeToColumn(column, key) {
           console.log(`Found nodes to re-add:`, nodesToReAdd);  // Debugging: print found nodes
 
           // Check if the nodes already exist in the dataset
-          //const nodeExists = nodesToReAdd.some(d => dataset.some(existingNode => existingNode[key] === d[key]));
-          const nodeExists = false;
+          const nodeExists = nodesToReAdd.some(d => dataset.some(existingNode => existingNode[key] === d[key]));
+          //const nodeExists = false;
           console.log(`Do any of the nodes already exist in dataset?: ${nodeExists}`);  // Debugging: check if nodes exist in dataset
 
           if (!nodeExists) {
               // Add all the found nodes back to dataset
               dataset.push(...nodesToReAdd);
               console.log(`Nodes added to dataset. Re-rendering Sankey diagram...`);
-
+              //dataset = reduceToTopN(nodesToReAdd);
               renderSankey(dataset, col1, col2);  // Re-render the Sankey diagram with updated data
           } else {
               alert("Node(s) already exist in the dataset.");
