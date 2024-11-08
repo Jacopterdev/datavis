@@ -18,6 +18,9 @@ let dataset;
 
 let graph = null;  // Store the current graph data
 
+let col1;
+let col2;
+
 const categoricalColumns = [
     "Month", "Country", "Region", "city", "AttackType", 
     "Target", "Group", "Target_type", "Weapon_type", 
@@ -36,7 +39,7 @@ let sankey;
 
 
 // Function to group and either count rows or sum specific columns
-function groupAndAggregate(data, col1, col2, operation, sumCol) {
+function groupAndAggregate(data, operation, sumCol) {
   const groupedData = {};
 
   data.forEach(row => {
@@ -55,7 +58,7 @@ function groupAndAggregate(data, col1, col2, operation, sumCol) {
 }
 
 // Function to prepare data for the Sankey diagram
-function prepareSankeyData(data, col1, col2) {
+function prepareSankeyData(data) {
     const keys = [col1, col2];
     const nodes = [];
     const nodeByKey = new d3.InternMap([], JSON.stringify);
@@ -97,14 +100,19 @@ function prepareSankeyData(data, col1, col2) {
     return { nodes, links };
 }
 
-function updateChart(data, col1, col2, linkAttr) {
-  const filteredData = categorizeData(data, col1, col2);
+function updateChart(data, newCol1, newCol2, linkAttr) {
+  
+  //Update Cols
+  col1 = newCol1;
+  col2 = newCol2;
+
+  const filteredData = categorizeData(data);
 
   // Group and count depending on the link/quantifiable data type
   if (linkAttr === 'Incidents') {
-    groupedData = groupAndAggregate(filteredData, col1, col2, 'count');
+    groupedData = groupAndAggregate(filteredData, 'count');
   } else {
-    groupedData = groupAndAggregate(filteredData, col1, col2, 'sum', linkAttr);
+    groupedData = groupAndAggregate(filteredData, 'sum', linkAttr);
   }
 
   const width = 928;
@@ -128,14 +136,14 @@ function updateChart(data, col1, col2, linkAttr) {
     .nodePadding(20)
     .extent([[0, 5], [width, height - 5]]);
 
-
-  //graph = prepareSankeyData(groupedData, col1, col2);
-  renderSankey(groupedData, col1, col2);
+  console.log(groupedData);
+  renderSankey(groupedData);
+  
 }
 
-function renderSankey(data, col1, col2) {
+function renderSankey(data) {
   // Convert to Sankey data
-  graph = prepareSankeyData(data, col1, col2);
+  graph = prepareSankeyData(data);
 
   console.log("Sankey data:", graph);
 
@@ -162,7 +170,7 @@ function renderSankey(data, col1, col2) {
   const nodeEnter = node.enter().append("g")
     .attr("class", "node")
     .on("click", function(event, d) {
-      handleNodeClick(d, col1, col2);
+      handleNodeClick(d);
     });
 
   nodeEnter.append("rect")
@@ -273,17 +281,17 @@ function getTopCategories(data, col, topN = 12) {
   return { topCategories, counts };
 }
 
-function handleNodeClick(clickedNode, col1, col2) {
+function handleNodeClick(clickedNode) {
   // Remove clicked node from data
   const newDataset = dataset.filter(row => row[col1] !== clickedNode.name && row[col2] !== clickedNode.name);
 
   dataset = newDataset;
   // Re-render the Sankey diagram with updated data
-  renderSankey(newDataset, col1, col2);
+  renderSankey(dataset, col1, col2);
 }
 
 // Function to categorize data and group non-top categories as 'Other'
-function categorizeData(data, col1, col2, topN = 12) {
+function categorizeData(data, topN = 12) {
   const { topCategories: topCol1, counts: countsCol1 } = getTopCategories(data, col1, topN);
   const { topCategories: topCol2, counts: countsCol2 } = getTopCategories(data, col2, topN);
 
@@ -301,6 +309,52 @@ function categorizeData(data, col1, col2, topN = 12) {
     return newRow;
   });
 }
+
+// Function to add a node to the specified column (either col1 or col2)
+function addNodeToColumn(column, key) {
+  const inputId = `node${column.charAt(0).toUpperCase() + column.slice(1)}`;  // Dynamically get input ID
+  const buttonId = `add${column.charAt(0).toUpperCase() + column.slice(1)}Button`; // Dynamically get button ID
+
+  // Get the value from the input field and trim spaces
+  const value = document.getElementById(inputId).value.trim();
+  console.log(`Input value for ${column}: '${value}'`);  // Debugging input value
+
+  if (value) {
+      // Loop through groupedData and find the matching entries by column (key)
+      const nodesToReAdd = groupedData.filter(d => {
+          // Trim spaces and handle case insensitivity
+          const dataValue = d[key]?.toLowerCase().trim();
+          const inputValue = value.toLowerCase();
+          return dataValue === inputValue;
+      });  // Find nodes by column value
+      console.log(`Searching for '${value}' in ${key} within groupedData...`);
+      console.log(groupedData);
+      
+      if (nodesToReAdd.length > 0) {
+          console.log(`Found nodes to re-add:`, nodesToReAdd);  // Debugging: print found nodes
+
+          // Check if the nodes already exist in the dataset
+          //const nodeExists = nodesToReAdd.some(d => dataset.some(existingNode => existingNode[key] === d[key]));
+          const nodeExists = false;
+          console.log(`Do any of the nodes already exist in dataset?: ${nodeExists}`);  // Debugging: check if nodes exist in dataset
+
+          if (!nodeExists) {
+              // Add all the found nodes back to dataset
+              dataset.push(...nodesToReAdd);
+              console.log(`Nodes added to dataset. Re-rendering Sankey diagram...`);
+
+              renderSankey(dataset, col1, col2);  // Re-render the Sankey diagram with updated data
+          } else {
+              alert("Node(s) already exist in the dataset.");
+          }
+      } else {
+          alert(`No node found in the grouped data for ${column}: ${value}`);
+      }
+  } else {
+      alert(`Please enter a value for ${column}.`);
+  }
+}
+
 
 // Load the data
 d3.csv("terror_cleaned.csv", d3.autoType).then(data => {
@@ -337,6 +391,19 @@ d3.csv("terror_cleaned.csv", d3.autoType).then(data => {
         const linkAttr = selectLink.property("value");
         dataset = originalDataset;
         updateChart(dataset, col1, col2, linkAttr);
+      });
+
+      
+      // Handle click event for adding a node to col1
+      document.getElementById('addCol1Button').addEventListener('click', function () {
+        const col1 = select1.property("value");
+        addNodeToColumn('col1', col1);  // Call function to add to col1
+      });
+
+      // Handle click event for adding a node to col2
+      document.getElementById('addCol2Button').addEventListener('click', function () {
+        const col2 = select2.property("value");
+        addNodeToColumn('col2', col2);  // Call function to add to col2
       });
 
       // Initial chart
