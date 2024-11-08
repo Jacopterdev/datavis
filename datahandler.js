@@ -84,7 +84,7 @@ function prepareSankeyData(data) {
       const linkByKey = new d3.InternMap([], JSON.stringify);
       for (const d of data) {
         const names = prefix.map(k => d[k]);
-        const value = +d.Count || 1;
+        const value = +d.Count || 0; //Not sure if 1 or 0...
         let link = linkByKey.get(names);
         if (link) { link.value += value; continue; }
         link = {
@@ -335,7 +335,7 @@ function addNodeToColumn(column, key, otherKey) {
           // Check if the otherKey exists in the dataset
           const otherKeyExists = dataset.some(existingNode => existingNode[otherKey] === d[otherKey]);
 
-          return dataValue === inputValue && otherKeyExists;
+          return dataValue === inputValue && d.Count > 0 && dataset.some(existingNode => existingNode[otherKey] === d[otherKey]);
       });  // Find nodes by column value
       console.log(`Searching for '${value}' in ${key} within groupedData...`);
       console.log(groupedData);
