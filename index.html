@@ -12,8 +12,47 @@
 
 	<link rel="stylesheet" href="style.css">
 	<title>D3 Sankey</title>
+    <style>
+        body {
+            margin: 0px;
+            padding: 0;
+        }
+        .container {
+            background-color: whitesmoke;
+            text-align: left;
+        }
+        .navs {
+            display: flex;
+            justify-content: flex-start;
+        }
+        .navs a {
+            margin: 4px
+        }
+        .navs img {
+            width: 32px;
+            height: 32px;
+            display: block;
+            padding-top: 2px;
+            padding-bottom: 2px;
+        }
+        .navs a:hover {
+            border-radius: 4px;
+            background-color: #ffffff;
+            transition: background-color 0.3s ease;
+        }
+    </style>
 </head>
 <body>
+    <div class="container">
+        <div class="navs">
+            <a href="index.html">
+                <img src="sankey.svg" alt="Sankey Diagram">
+            </a>
+            <a href="spiral.html">
+                <img src="spiral.svg" alt="Spiral Diagram">
+            </a>
+        </div>
+    </div>
     <div id="controls">
         <label for="column1">Select Column 1:</label>
         <select id="column1"></select>

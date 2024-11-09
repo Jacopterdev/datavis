@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 128 128">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: url(#radial-gradient);
+      }
+    </style>
+    <radialGradient id="radial-gradient" cx="203.43" cy="64" fx="203.43" fy="64" r="44.24" gradientTransform="translate(267.43) rotate(-180) scale(1 -1)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ff4215"/>
+      <stop offset="1" stop-color="#821215"/>
+    </radialGradient>
+  </defs>
+  <path class="cls-1" d="M45.56,27.64c4.14,0,5.68-1.11,9.77-4.06,5.79-4.18,14.55-10.49,30.75-10.49h14.28v28.85h-14.28c-6.88,0-9.36,1.79-13.87,5.04-5.56,4.01-13.19,9.51-26.65,9.51h-.19c5.83,0,12.57,2.9,19.71,5.97,6.55,2.82,13.33,5.73,18.43,5.73h16.85v3.32s0,1.73,0,1.73v27.12h-14.28c-6.88,0-9.36,1.79-13.87,5.04-5.56,4.01-13.19,9.51-26.65,9.51h-17.93v-28.85h17.93c4.14,0,5.68-1.11,9.77-4.06,4.58-3.3,11.02-7.94,21.52-9.74-4.44-1.16-9.15-3.18-13.77-5.16-6.36-2.73-12.93-5.56-17.71-5.56h-17.74v-5.05s0-28.85,0-28.85h17.93Z"/>
+</svg>
