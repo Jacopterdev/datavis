@@ -27,6 +27,12 @@ const categoricalColumns = [
     "Deadly", "AnyCasualties"
 ];
 
+const categoricalColumnsModerated = [
+  "Country", "Region", "AttackType", "Target_type", "Weapon_type", 
+  "Deadly", "AnyCasualties"
+];
+
+
 // List of quantifiable columns
 const quantifiableColumns = ['Incidents', 'Killed', 'Wounded', 'Casualties'];
 
@@ -100,19 +106,24 @@ function prepareSankeyData(data) {
     return { nodes, links };
 }
 
-function updateChart(data, newCol1, newCol2, linkAttr) {
+function updateChart(data, newCol1, newCol2, linkAttr, bypassFilter=false) {
   
   //Update Cols
   col1 = newCol1;
   col2 = newCol2;
 
-  
+  var filteredData = data;
 
+  if(!bypassFilter){
+    filteredData = filterData(data, getSelectedValues());
+  }
+  
+  console.log("filtereddata:", filteredData);
   // Group and count depending on the link/quantifiable data type
   if (linkAttr === 'Incidents') {
-    groupedData = groupAndAggregate(data, 'count');
+    groupedData = groupAndAggregate(filteredData, 'count');
   } else {
-    groupedData = groupAndAggregate(data, 'sum', linkAttr);
+    groupedData = groupAndAggregate(filteredData, 'sum', linkAttr);
   }
 
   const width = 928;
@@ -363,6 +374,64 @@ function addNodeToColumn(column, key, otherKey) {
   }
 }
 
+function setupFilterMenu(data){
+  var uniqueValues = {};
+  console.log("scanning dataset");
+            // Extract unique values for each column
+            categoricalColumnsModerated.forEach(function(column) {
+                uniqueValues[column] = Array.from(new Set(data.map(function(d) { return d[column]; })));
+                console.log(uniqueValues);
+            });
+
+            // Populate each select element with the unique values
+            categoricalColumnsModerated.forEach(function(column) {
+                populateSelect(column, uniqueValues[column]);
+            });
+}
+
+function populateSelect(elementId, data) {
+  console.log("populating", elementId);
+  var select = document.getElementById(elementId);
+  if(select == null) {
+    console.log("couldnt find", elementId);
+    return;
+  }
+  data.forEach(function(item) {
+      var option = document.createElement("option");
+      option.value = item;
+      option.text = item;
+      option.selected = true; // Select all options by default
+      select.add(option);
+  });
+  // Re-initialize the multiselect plugin to reflect new options
+  $(select).multiselect('rebuild');
+}
+
+// Function to filter the data based on selected values
+// Function to filter the data based on selected values
+function filterData(data, selectedValues) {
+  return data.filter(function(d) {
+      return Object.keys(selectedValues).every(function(key) {
+          // Convert selected values and data value to strings
+          const selectedValuesForKey = selectedValues[key].map(v => v.trim().toString()); // Convert selected values to strings
+          const dataValueForKey = d[key].toString(); // Convert data value to string
+
+          // Check if the value is included
+          const isIncluded = selectedValuesForKey.includes(dataValueForKey);
+
+          // Perform the filtering check
+          return selectedValuesForKey.length === 0 || isIncluded;
+      });
+  });
+}
+
+function getSelectedValues() {
+  var selectedValues = {};
+  categoricalColumnsModerated.forEach(function (column) {
+    selectedValues[column] = $('#' + column).val();
+  });
+  return selectedValues;
+}
 
 // Load the data
 d3.csv("terror_cleaned.csv", d3.autoType).then(data => {
@@ -370,6 +439,8 @@ d3.csv("terror_cleaned.csv", d3.autoType).then(data => {
     const originalDataset = dataset;
 
     console.log("Data loaded:", data);
+
+    setupFilterMenu(data); //Some of them are not rendered: Limited to only moderate sized columns...
 
     // Populate dropdowns
     const select1 = d3.select("#column1");
@@ -415,7 +486,7 @@ d3.csv("terror_cleaned.csv", d3.autoType).then(data => {
       });
 
       // Initial chart
-      updateChart(dataset, categoricalColumns[2], categoricalColumns[4] || categoricalColumns[2], quantifiableColumns[0]);
+      updateChart(dataset, categoricalColumns[2], categoricalColumns[4] || categoricalColumns[2], quantifiableColumns[0], true);
     } else {
       console.error("No categorical columns found in the dataset.");
     }

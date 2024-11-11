@@ -10,8 +10,11 @@
     <script src="https://unpkg.com/d3-sankey@0"></script>
 	<script src="datahandler.js"></script>
 
+	
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.15/css/bootstrap-multiselect.css">
 	<link rel="stylesheet" href="style.css">
-	<title>D3 Sankey</title>
+    <title>D3 Sankey</title>
     <style>
         body {
             margin: 0px;
@@ -20,6 +23,7 @@
         .container {
             background-color: whitesmoke;
             text-align: left;
+            margin: 0;
         }
         .navs {
             display: flex;
@@ -40,6 +44,20 @@
             background-color: #ffffff;
             transition: background-color 0.3s ease;
         }
+        .column {
+            width: 20%;
+            float: left;
+            margin: 0;
+            padding: 10px;
+        }
+        .multiselect-container {
+            width: 100% !important;
+        }
+        .multiselect-label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 5px;
+        }
     </style>
 </head>
 <body>
@@ -53,20 +71,68 @@
             </a>
         </div>
     </div>
-    <div id="controls">
-        <label for="column1">Select Column 1:</label>
-        <select id="column1"></select>
-        <label for="link">Select link quantification</label>
-        <select id="link"></select>
-        <label for="column2">Select Column 2:</label>
-        <select id="column2"></select>
-        <button id="update">Update Chart</button>
+    <div class="mainPanel">
+        <div class="column">
+            <label class="multiselect-label" for="Region">Region</label>
+        <select id="Region" class="multiselect" multiple="multiple"></select>
+
+        <label class="multiselect-label" for="Country">Country</label>
+        <select id="Country" class="multiselect" multiple="multiple"></select>
+
+        <label class="multiselect-label" for="city">City</label>
+        <select id="city" class="multiselect" multiple="multiple"></select>
+
+        <label class="multiselect-label" for="AttackType">Attack Type</label>
+        <select id="AttackType" class="multiselect" multiple="multiple"></select>
+
+        <label class="multiselect-label" for="Weapon_type">Weapon Type</label>
+        <select id="Weapon_type" class="multiselect" multiple="multiple"></select>
+
+        <label class="multiselect-label" for="AnyCasualties">Is Casualties</label>
+        <select id="AnyCasualties" class="multiselect" multiple="multiple"></select>
+
+        <label class="multiselect-label" for="Deadly">Deadly</label>
+        <select id="Deadly" class="multiselect" multiple="multiple"></select>
+
+        <label class="multiselect-label" for="Target_type">Target Type</label>
+        <select id="Target_type" class="multiselect" multiple="multiple"></select>
+
+        <label class="multiselect-label" for="Target">Target</label>
+        <select id="Target" class="multiselect" multiple="multiple"></select>
+
+        <label class="multiselect-label" for="Group">Group</label>
+        <select id="Group" class="multiselect" multiple="multiple"></select>
         
-        <input type="text" id="nodeCol1" placeholder="Enter value for Col1">
-        <button id="addCol1Button">Add to Col1</button>
-        <input type="text" id="nodeCol2" placeholder="Enter value for Col2">
-        <button id="addCol2Button">Add to Col2</button>
-      </div>
-      <div id="chart"></div>
+        <button class="btn" id="update">Apply</button>
+        </div>
+    
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.15/js/bootstrap-multiselect.min.js"></script>
+        <script>
+            $(document).ready(function() {
+                $('.multiselect').multiselect({
+                    includeSelectAllOption: true,
+                    enableFiltering: true,
+                    buttonWidth: '100%'
+                });
+            });
+        </script>
+        <div id="controls">
+            <label for="column1">Select Column 1:</label>
+            <select id="column1"></select>
+            <label for="link">Select link quantification</label>
+            <select id="link"></select>
+            <label for="column2">Select Column 2:</label>
+            <select id="column2"></select>
+            
+            
+            <input type="text" id="nodeCol1" placeholder="Enter value for Col1">
+            <button id="addCol1Button">Add to Col1</button>
+            <input type="text" id="nodeCol2" placeholder="Enter value for Col2">
+            <button id="addCol2Button">Add to Col2</button>
+        </div>
+        <div id="chart"></div>
+    </div>
 </body>
 </html>
