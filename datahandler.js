@@ -129,9 +129,6 @@ function updateChart(data, newCol1, newCol2, linkAttr, bypassFilter=false) {
     groupedData = groupAndAggregate(filteredData, 'sum', linkAttr);
   }
 
-  const width = 928;
-  const height = 720;
-
   // Remove any existing SVG
   d3.select("#chart").selectAll("*").remove();
 

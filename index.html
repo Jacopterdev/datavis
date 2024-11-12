@@ -28,10 +28,15 @@
             background-color: whitesmoke;
             text-align: left;
             margin: 0;
+            
+        
         }
         .navs {
             display: flex;
             justify-content: flex-start;
+            border-style: solid;
+            border-width: 0 0 1px 0;
+            border-color: rgb(196, 196, 196);
         }
         .navs a {
             margin: 4px
@@ -62,6 +67,19 @@
             display: block;
             margin-bottom: 5px;
         }
+        #controls{
+            padding: 2px;
+           
+        }
+        #controls div{
+            width: 927px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .controlsgroup{
+            display: block !important;
+        }
+
     </style>
 </head>
 <body>
@@ -125,23 +143,30 @@
         </script>
         <div id="controls">
             <div>
-                <label for="column1">Select Column 1:</label>
-                <select id="column1"></select>
-                <label for="link">Select link quantification</label>
-                <select id="link"></select>
-                <label for="column2">Select Column 2:</label>
-                <select id="column2"></select>
+                <div class="controlsgroup">
+                    <label for="column1">Select Column 1:</label>
+                    <select id="column1"></select>
+                </div>
+                <div class="controlsgroup">
+                    <label for="link">Select link quantification</label>
+                    <select id="link"></select>
+                </div>
+                <div class="controlsgroup">
+                    <label for="column2">Select Column 2:</label>
+                    <select id="column2"></select>
+                </div>
+                
             </div>
             <div>
-                <input type="text" id="nodeCol1" placeholder="Enter value for Col1">
-                <button class="btn" id="addCol1Button">Add</button>
-                <input type="text" id="nodeCol2" placeholder="Enter value for Col2">
-                <button class="btn" id="addCol2Button">Add</button>
+                <div class="controlsgroup">
+                    <input type="text" id="nodeCol1" placeholder="Add note">
+                    <button class="btn" id="addCol1Button">Add</button>
+                </div>
+                <div class="controlsgroup">
+                    <input type="text" id="nodeCol2" placeholder="Add note">
+                    <button class="btn" id="addCol2Button">Add</button>
+                </div>
             </div>
-            
-            
-            
-            
         </div>
         <div id="chart"></div>
     </div>
