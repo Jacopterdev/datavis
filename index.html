@@ -20,6 +20,10 @@
             margin: 0px;
             padding: 0;
         }
+        .controls{
+            flex-direction: column;
+            width: 928px;
+        }
         .container {
             background-color: whitesmoke;
             text-align: left;
@@ -72,38 +76,39 @@
         </div>
     </div>
     <div class="mainPanel">
-        <div class="column">
+        <div class="column" style="background-color: rgb(248, 248, 248)">
+            <h5 style="color: grey;">Pre-filtering</h5>
             <label class="multiselect-label" for="Region">Region</label>
-        <select id="Region" class="multiselect" multiple="multiple"></select>
+            <select id="Region" class="multiselect" multiple="multiple"></select>
 
-        <label class="multiselect-label" for="Country">Country</label>
-        <select id="Country" class="multiselect" multiple="multiple"></select>
+            <label class="multiselect-label" for="Country">Country</label>
+            <select id="Country" class="multiselect" multiple="multiple"></select>
 
-        <label class="multiselect-label" for="city">City</label>
-        <select id="city" class="multiselect" multiple="multiple"></select>
+            <label class="multiselect-label" for="city">City</label>
+            <select id="city" class="multiselect" multiple="multiple"></select>
 
-        <label class="multiselect-label" for="AttackType">Attack Type</label>
-        <select id="AttackType" class="multiselect" multiple="multiple"></select>
+            <label class="multiselect-label" for="AttackType">Attack Type</label>
+            <select id="AttackType" class="multiselect" multiple="multiple"></select>
 
-        <label class="multiselect-label" for="Weapon_type">Weapon Type</label>
-        <select id="Weapon_type" class="multiselect" multiple="multiple"></select>
+            <label class="multiselect-label" for="Weapon_type">Weapon Type</label>
+            <select id="Weapon_type" class="multiselect" multiple="multiple"></select>
 
-        <label class="multiselect-label" for="AnyCasualties">Is Casualties</label>
-        <select id="AnyCasualties" class="multiselect" multiple="multiple"></select>
+            <label class="multiselect-label" for="AnyCasualties">Is Casualties</label>
+            <select id="AnyCasualties" class="multiselect" multiple="multiple"></select>
 
-        <label class="multiselect-label" for="Deadly">Deadly</label>
-        <select id="Deadly" class="multiselect" multiple="multiple"></select>
+            <label class="multiselect-label" for="Deadly">Deadly</label>
+            <select id="Deadly" class="multiselect" multiple="multiple"></select>
 
-        <label class="multiselect-label" for="Target_type">Target Type</label>
-        <select id="Target_type" class="multiselect" multiple="multiple"></select>
+            <label class="multiselect-label" for="Target_type">Target Type</label>
+            <select id="Target_type" class="multiselect" multiple="multiple"></select>
 
-        <label class="multiselect-label" for="Target">Target</label>
-        <select id="Target" class="multiselect" multiple="multiple"></select>
+            <label class="multiselect-label" for="Target">Target</label>
+            <select id="Target" class="multiselect" multiple="multiple"></select>
 
-        <label class="multiselect-label" for="Group">Group</label>
-        <select id="Group" class="multiselect" multiple="multiple"></select>
-        
-        <button class="btn" id="update">Apply</button>
+            <label class="multiselect-label" for="Group">Group</label>
+            <select id="Group" class="multiselect" multiple="multiple"></select>
+            <hr>
+            <button class="btn" id="update">Apply</button>
         </div>
     
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
@@ -119,18 +124,24 @@
             });
         </script>
         <div id="controls">
-            <label for="column1">Select Column 1:</label>
-            <select id="column1"></select>
-            <label for="link">Select link quantification</label>
-            <select id="link"></select>
-            <label for="column2">Select Column 2:</label>
-            <select id="column2"></select>
+            <div>
+                <label for="column1">Select Column 1:</label>
+                <select id="column1"></select>
+                <label for="link">Select link quantification</label>
+                <select id="link"></select>
+                <label for="column2">Select Column 2:</label>
+                <select id="column2"></select>
+            </div>
+            <div>
+                <input type="text" id="nodeCol1" placeholder="Enter value for Col1">
+                <button class="btn" id="addCol1Button">Add</button>
+                <input type="text" id="nodeCol2" placeholder="Enter value for Col2">
+                <button class="btn" id="addCol2Button">Add</button>
+            </div>
             
             
-            <input type="text" id="nodeCol1" placeholder="Enter value for Col1">
-            <button id="addCol1Button">Add to Col1</button>
-            <input type="text" id="nodeCol2" placeholder="Enter value for Col2">
-            <button id="addCol2Button">Add to Col2</button>
+            
+            
         </div>
         <div id="chart"></div>
     </div>

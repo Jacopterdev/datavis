@@ -21,6 +21,9 @@ let graph = null;  // Store the current graph data
 let col1;
 let col2;
 
+//Node Color maps
+const colorMap = new Map();
+
 const categoricalColumns = [
     "Month", "Country", "Region", "city", "AttackType", 
     "Target", "Group", "Target_type", "Weapon_type", 
@@ -159,13 +162,13 @@ function renderSankey(data) {
 
   console.log("Sankey data:", graph);
 
-  // Extract rows for color coding
+   // Extract rows for color coding
   const col2Rows = Array.from(new Set(data.map(d => d[col2])));
   const color = d3.scaleOrdinal()
     .domain(col2Rows)
     .range(d3.schemeCategory10)
     .unknown("#ccc");
-
+  
   const { nodes, links } = sankey({
     nodes: graph.nodes.map(d => Object.create(d)),
     links: graph.links.map(d => Object.create(d))
@@ -210,6 +213,10 @@ function renderSankey(data) {
   node.exit().transition().duration(750)
   .attr("opacity", 0)
   .remove();
+
+  // When rendering nodes in the Sankey plot
+  //nodes.attr("fill", d => nodeColor(d));
+  
 
   // Bind data to links
   const link = svg.selectAll(".link")
