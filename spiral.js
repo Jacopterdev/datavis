@@ -63,41 +63,49 @@ am4core.ready(function () {
         return parseInt(text, 10).toLocaleString(); // Add commas for thousands
       });
 
-      var series = chart.series.push(new am4plugins_timeline.CurveColumnSeries());
+      var series = chart.series.push(
+        new am4plugins_timeline.CurveColumnSeries()
+      );
       series.dataFields.dateX = "date";
       series.dataFields.valueY = "value"; // Use constant value for length
-      series.tooltipText = "Wounded: {wounded}\nIncidents: {incidents}\nKilled: {killed}"; // Update tooltip to show actual wounded, killed, and incidents count
+      series.tooltipText =
+        "Wounded: {wounded}\nIncidents: {incidents}\nKilled: {killed}"; // Update tooltip to show actual wounded, killed, and incidents count
       series.tooltip.pointerOrientation = "vertical";
       series.tooltip.background.fillOpacity = 0.7;
       series.strokeWidth = 2;
 
-      // Color based on the selected metric
+      // Color based on the selected metric (from white to red)
       function updateChartData(metric) {
-        series.tooltipText = `${metric.charAt(0).toUpperCase() + metric.slice(1)}: {${metric}}\nIncidents: {incidents}`;
-        series.columns.template.adapter.add("fill", function (fill, target) {
-          const value = target.dataItem.dataContext[metric]; // Use selected metric for color coding
+        series.tooltipText = `${
+          metric.charAt(0).toUpperCase() + metric.slice(1)
+        }: {${metric}}\nIncidents: {incidents}`;
 
-          if (value < 4000) {
-            return am4core.color("#ffcccc"); // Light red for counts less than 4000
-          } else if (value < 8000) {
-            return am4core.color("#ff9999"); // Medium light red for counts between 4000 and 8000
-          } else if (value < 12000) {
-            return am4core.color("#ff6666"); // Medium red for counts between 8000 and 12000
-          } else {
-            return am4core.color("#ff3333"); // Dark red for counts 12000 and above
-          }
+        // Create a color scale from 0 (white) to the maximum value (red)
+        const maxValue = d3.max(chartData, (d) => d[metric]); // Get the maximum value for the selected metric
+        const minValue = d3.min(chartData, (d) => d[metric]);
+        const colorScale = d3
+          .scaleLinear()
+          .domain([minValue, maxValue]) // Define the domain: from 0 to the max value of the metric
+          .range(["#ffffff", "#000000"]); // Interpolate from white to red
+
+        series.columns.template.adapter.add("fill", function (fill, target) {
+          const value = target.dataItem.dataContext[metric]; // Get the value for the selected metric
+          return am4core.color(colorScale(value)); // Return the interpolated color
         });
 
+        // Update chart data with selected metric
         chart.data = chartData.map(function (d) {
           return { ...d, value: constantValue, [metric]: d[metric] };
         });
       }
 
       // Add event listener for dropdown change
-      document.getElementById("data-select").addEventListener("change", function (event) {
-        const selectedMetric = event.target.value;
-        updateChartData(selectedMetric); // Update chart data based on selection
-      });
+      document
+        .getElementById("data-select")
+        .addEventListener("change", function (event) {
+          const selectedMetric = event.target.value;
+          updateChartData(selectedMetric); // Update chart data based on selection
+        });
 
       // Initial chart data
       updateChartData("wounded"); // Set initial chart to show wounded data
