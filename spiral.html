@@ -3,10 +3,63 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Resources -->
+    <script src="https://cdn.amcharts.com/lib/4/core.js"></script>
+    <script src="https://cdn.amcharts.com/lib/4/charts.js"></script>
+    <script src="https://cdn.amcharts.com/lib/4/plugins/timeline.js"></script>
+    <script src="https://cdn.amcharts.com/lib/4/themes/animated.js"></script>
+    <script src="https://d3js.org/d3.v6.min.js"></script>
+
     <script src="spiral.js"></script>
+
     <title>Document</title>
   </head>
   <body>
+    <div id="dropdown-container">
+      <label for="data-select">Select Data:</label>
+      <select id="data-select">
+        <option value="wounded">Wounded</option>
+        <option value="killed">Killed</option>
+        <option value="incidents">Incidents</option>
+      </select>
+    </div>
     <div id="chartdiv"></div>
   </body>
 </html>
+
+<style>
+  label {
+    font-family: Georgia, "Times New Roman", Times, serif;
+  }
+
+  #dropdown-container {
+    margin: 20px auto;
+    text-align: center;
+    padding: 10px;
+  }
+
+  #dropdown-container label {
+    font-size: 18px;
+    font-weight: bold;
+    margin-right: 10px;
+  }
+
+  #data-select {
+    font-family: Georgia, "Times New Roman", Times, serif;
+    font-size: 18px;
+    border-radius: 5px;
+    height: 40px;
+    width: 200px;
+    border: 1px solid #faf5f5;
+    background-color: #ffffff;
+    outline: none;
+  }
+
+  #chartdiv {
+    width: 70%;
+    height: 900px;
+    margin: 20px auto;
+    background-color: #f4f4f4;
+    border-radius: 8px;
+  }
+</style>
