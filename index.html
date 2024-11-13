@@ -80,6 +80,40 @@
             display: block !important;
         }
 
+        .slider-container {
+            display: flex;
+            align-items: center;
+        }
+        .slider-container input[type=range] {
+            flex-grow: 1;
+            margin-right: 10px;
+        }
+        .tag-input-container {
+            display: flex;
+            flex-wrap: wrap;
+            border: 1px solid #ced4da;
+            padding: 5px;
+            border-radius: 4px;
+        }
+        .tag-input-container input {
+            border: none;
+            outline: none;
+            flex-grow: 1;
+            min-width: 120px;
+        }
+        .tag {
+            background-color: #007bff;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            margin: 2px;
+            display: flex;
+            align-items: center;
+        }
+        .tag .remove-tag {
+            margin-left: 5px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -103,7 +137,12 @@
             <select id="Country" class="multiselect" multiple="multiple"></select>
 
             <label class="multiselect-label" for="city">City</label>
-            <select id="city" class="multiselect" multiple="multiple"></select>
+            <select id="city0" class="multiselect" multiple="multiple"></select>
+
+            <label class="multiselect-label" for="cityTagInput">City</label>
+            <div id="city" class="tag-input-container">
+                <input type="text" id="cityTagInput" placeholder="Enter cities...">
+            </div>
 
             <label class="multiselect-label" for="AttackType">Attack Type</label>
             <select id="AttackType" class="multiselect" multiple="multiple"></select>
@@ -121,10 +160,33 @@
             <select id="Target_type" class="multiselect" multiple="multiple"></select>
 
             <label class="multiselect-label" for="Target">Target</label>
-            <select id="Target" class="multiselect" multiple="multiple"></select>
+            <select id="Target0" class="multiselect" multiple="multiple"></select>
+
+            <label class="multiselect-label" for="targetTagInput">Target</label>
+            <div id="Target" class="tag-input-container">
+                <input type="text" id="targetTagInput" placeholder="Enter targets...">
+            </div>
 
             <label class="multiselect-label" for="Group">Group</label>
-            <select id="Group" class="multiselect" multiple="multiple"></select>
+            <select id="Group0" class="multiselect" multiple="multiple"></select>
+
+            <label class="multiselect-label" for="groupTagInput">Group</label>
+            <div id="Group" class="tag-input-container">
+                <input type="text" id="groupTagInput" placeholder="Enter groups...">
+            </div>
+
+            <div>
+                <div>
+                    <div>
+                        <label for="topNSlider">Number of Results</label>
+                        <div class="slider-container">
+                            <input type="range" class="form-control-range" id="topNSlider" min="3" max="10">
+                            <span id="sliderValue">5</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <hr>
             <button class="btn" id="update">Apply</button>
         </div>

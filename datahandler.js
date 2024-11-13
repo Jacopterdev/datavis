@@ -21,6 +21,8 @@ let graph = null;  // Store the current graph data
 let col1;
 let col2;
 
+let selectedTopN = 5;
+
 //Node Color maps
 const colorMap = new Map();
 
@@ -142,7 +144,7 @@ function updateChart(data, newCol1, newCol2, linkAttr, bypassFilter=false) {
 
   sankey = d3.sankey()
     .nodeSort((a, b) => d3.descending(a.value, b.value))
-    .linkSort(null)
+    .linkSort((a, b) => d3.descending(a.value, b.value))
     .nodeWidth(40)
     .nodePadding(20)
     .extent([[0, 5], [width, height - 5]]);
@@ -281,7 +283,7 @@ function renderSankey(data) {
 }
 
 // Function to get top N categories by count along with counts
-function getTopCategories(data, col, topN = 4) {
+function getTopCategories(data, col, topN) {
   const counts = {};
 
   data.forEach(row => {
@@ -307,7 +309,7 @@ function handleNodeClick(clickedNode) {
 }
 
 // Function to categorize data and group non-top categories as 'Other' based on the includeOther flag
-function reduceToTopN(data, topN = 4, includeOther = false) {
+function reduceToTopN(data, topN = selectedTopN, includeOther = false) {
   const { topCategories: topCol1, counts: countsCol1 } = getTopCategories(data, col1, topN);
   const { topCategories: topCol2, counts: countsCol2 } = getTopCategories(data, col2, topN);
 
@@ -418,7 +420,7 @@ function filterData(data, selectedValues) {
       return Object.keys(selectedValues).every(function(key) {
           // Convert selected values and data value to strings
           const selectedValuesForKey = selectedValues[key].map(v => v.trim().toString()); // Convert selected values to strings
-          const dataValueForKey = d[key].toString(); // Convert data value to string
+          const dataValueForKey = d[key].toString(); // Convert data value to string //TODO Change so that if the value is null, we just skip it. 
 
           // Check if the value is included
           const isIncluded = selectedValuesForKey.includes(dataValueForKey);
@@ -429,12 +431,70 @@ function filterData(data, selectedValues) {
   });
 }
 
+// function getSelectedValues() {
+//   var selectedValues = {};
+//   categoricalColumnsModerated.forEach(function (column) {
+//     selectedValues[column] = $('#' + column).val();
+//   });
+//   return selectedValues;
+// }
+
 function getSelectedValues() {
   var selectedValues = {};
+
+  // Get values from the multi-select elements
   categoricalColumnsModerated.forEach(function (column) {
     selectedValues[column] = $('#' + column).val();
   });
+
+  // Get values from the tag input containers
+  const tagContainers = ['city', 'Target', 'Group'];
+  tagContainers.forEach(function (containerId) {
+    selectedValues[containerId] = getTags(containerId);
+  });
+  console.log("Selected Values: ", selectedValues);
   return selectedValues;
+}
+
+function getTags(containerId) {
+  const tags = [];
+  const tagInputContainer = document.getElementById(containerId);
+  tagInputContainer.querySelectorAll('.tag').forEach(tagElement => {
+    tags.push(tagElement.firstChild.textContent);
+  });
+  return tags;
+}
+
+function setupTagInput(containerId, inputId) {
+  const tagInputContainer = document.getElementById(containerId);
+  const tagInput = document.getElementById(inputId);
+
+  tagInput.addEventListener('keypress', function(event) {
+    if (event.key === 'Enter' || event.key === ',') {
+      event.preventDefault();
+      const tagText = tagInput.value.trim();
+      if (tagText) {
+        addTag(tagText, tagInputContainer, tagInput);
+        tagInput.value = '';
+      }
+    }
+  });
+}
+
+function addTag(text, container, input) {
+  const tag = document.createElement('span');
+  tag.className = 'tag';
+  tag.textContent = text;
+
+  const removeTag = document.createElement('span');
+  removeTag.className = 'remove-tag';
+  removeTag.textContent = 'x';
+  removeTag.addEventListener('click', function() {
+    container.removeChild(tag);
+  });
+
+  tag.appendChild(removeTag);
+  container.insertBefore(tag, input);
 }
 
 // Load the data
@@ -445,6 +505,11 @@ d3.csv("terror_cleaned.csv", d3.autoType).then(data => {
     console.log("Data loaded:", data);
 
     setupFilterMenu(data); //Some of them are not rendered: Limited to only moderate sized columns...
+
+    // Setup the tag input fields
+    setupTagInput('city', 'cityTagInput');
+    setupTagInput('Target', 'targetTagInput');
+    setupTagInput('Group', 'groupTagInput');
 
     // Populate dropdowns
     const select1 = d3.select("#column1");
@@ -474,6 +539,20 @@ d3.csv("terror_cleaned.csv", d3.autoType).then(data => {
         const linkAttr = selectLink.property("value");
         dataset = originalDataset;
         updateChart(dataset, col1, col2, linkAttr);
+      });
+
+      // Get the slider element
+      const topNSlider = document.getElementById('topNSlider');
+      const sliderValue = document.getElementById('sliderValue');
+
+      // Set the default value of the slider
+      topNSlider.value = selectedTopN;
+      sliderValue.textContent = selectedTopN;
+
+      // Update the selectedTopN variable and displayed value when the slider value changes
+      topNSlider.addEventListener('input', function () {
+        selectedTopN = parseInt(topNSlider.value);
+        sliderValue.textContent = selectedTopN;
       });
 
       
