@@ -418,8 +418,16 @@ function populateSelect(elementId, data) {
 function filterData(data, selectedValues) {
   return data.filter(function(d) {
       return Object.keys(selectedValues).every(function(key) {
-          // Convert selected values and data value to strings
+        //if d[key] == null, skip it:
+        if (d[key] == null) {
+          return false; // Skip this key
+        }  
+        
+        // Convert selected values and data value to strings
           const selectedValuesForKey = selectedValues[key].map(v => v.trim().toString()); // Convert selected values to strings
+
+          
+
           const dataValueForKey = d[key].toString(); // Convert data value to string //TODO Change so that if the value is null, we just skip it. 
 
           // Check if the value is included
