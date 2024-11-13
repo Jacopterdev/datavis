@@ -20,10 +20,6 @@
             margin: 0px;
             padding: 0;
         }
-        .controls{
-            flex-direction: column;
-            width: 928px;
-        }
         .container {
             background-color: whitesmoke;
             text-align: left;
@@ -53,6 +49,10 @@
             background-color: #ffffff;
             transition: background-color 0.3s ease;
         }
+        .mainPanel{
+            display: flex;
+            flex-direction: row;
+        }
         .column {
             width: 20%;
             float: left;
@@ -69,15 +69,17 @@
         }
         #controls{
             padding: 2px;
+            width: 927px;
+            flex-direction: column;
            
         }
         #controls div{
-            width: 927px;
             display: flex;
             justify-content: space-between;
         }
         .controlsgroup{
-            display: block !important;
+            display: flex !important;
+            flex-direction: row;
         }
 
         .slider-container {
@@ -160,7 +162,7 @@
             <div id="Target" class="tag-input-container">
                 <input type="text" id="targetTagInput" placeholder="Enter targets...">
             </div>
-            
+
             <label class="multiselect-label" for="groupTagInput">Group</label>
             <div id="Group" class="tag-input-container">
                 <input type="text" id="groupTagInput" placeholder="Enter groups...">
@@ -194,6 +196,7 @@
                 });
             });
         </script>
+        <div id="middlePanel">
         <div id="controls">
             <div>
                 <div class="controlsgroup">
@@ -212,16 +215,17 @@
             </div>
             <div>
                 <div class="controlsgroup">
-                    <input type="text" id="nodeCol1" placeholder="Add note">
+                    <input type="text" id="nodeCol1" placeholder="Add node">
                     <button class="btn" id="addCol1Button">Add</button>
                 </div>
                 <div class="controlsgroup">
-                    <input type="text" id="nodeCol2" placeholder="Add note">
+                    <input type="text" id="nodeCol2" placeholder="Add node">
                     <button class="btn" id="addCol2Button">Add</button>
                 </div>
             </div>
         </div>
         <div id="chart"></div>
+        </div>
     </div>
 </body>
 </html>
