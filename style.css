@@ -6,6 +6,8 @@
     display: none;
     pointer-events: none;
     max-width: calc(100% - 20px); /* Ensure it doesn't exceed viewport width */
+    z-index: 1000; /* Ensure it's above everything else */
+    pointer-events: auto; /* Enable interaction */
 }
 
 .detail-row {

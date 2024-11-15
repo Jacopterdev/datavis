@@ -340,6 +340,43 @@ function reduceToTopN(data, topN = selectedTopN, includeOther = false) {
 }
 
 function addNodeToColumn(column, key, otherKey) {
+  console.log(otherKey);
+  const value = otherKey;
+  // Loop through groupedData and find the matching entries by column (key)
+  const nodesToReAdd = groupedData.filter(d => {
+    // Trim spaces and handle case insensitivity
+    const dataValue = d[key]?.toLowerCase().trim();
+    const inputValue = value.toLowerCase();
+
+    // Check if the otherKey exists in the dataset
+    const otherKeyExists = dataset.some(existingNode => existingNode[otherKey] === d[otherKey]);
+
+    return dataValue === inputValue && d.Count > 0 && dataset.some(existingNode => existingNode[otherKey] === d[otherKey]);
+  });  // Find nodes by column value
+  console.log(`Searching for '${value}' in ${key} within groupedData...`);
+  console.log(groupedData);
+
+  if (nodesToReAdd.length > 0) {
+    console.log(`Found nodes to re-add:`, nodesToReAdd);  // Debugging: print found nodes
+
+    // Check if the nodes already exist in the dataset
+    const nodeExists = nodesToReAdd.some(d => dataset.some(existingNode => existingNode[key] === d[key]));
+    console.log(`Do any of the nodes already exist in dataset?: ${nodeExists}`);  // Debugging: check if nodes exist in dataset
+
+    if (!nodeExists) {
+      // Add all the found nodes back to dataset
+      dataset.push(...nodesToReAdd);
+      console.log(`Nodes added to dataset. Re-rendering Sankey diagram...`);
+      renderSankey(dataset, col1, col2);  // Re-render the Sankey diagram with updated data
+    } else {
+      alert("Node(s) already exist in the dataset.");
+    }
+  } else {
+    alert(`No node found in the grouped data for ${column}: ${value}`);
+  }
+}
+
+function addNodeByInput(column, key, otherKey) {
   const inputId = `node${column.charAt(0).toUpperCase() + column.slice(1)}`;  // Dynamically get input ID
   const buttonId = `add${column.charAt(0).toUpperCase() + column.slice(1)}Button`; // Dynamically get button ID
 
@@ -348,38 +385,7 @@ function addNodeToColumn(column, key, otherKey) {
   console.log(`Input value for ${column}: '${value}'`);  // Debugging input value
 
   if (value) {
-      // Loop through groupedData and find the matching entries by column (key)
-      const nodesToReAdd = groupedData.filter(d => {
-          // Trim spaces and handle case insensitivity
-          const dataValue = d[key]?.toLowerCase().trim();
-          const inputValue = value.toLowerCase();
-
-          // Check if the otherKey exists in the dataset
-          const otherKeyExists = dataset.some(existingNode => existingNode[otherKey] === d[otherKey]);
-
-          return dataValue === inputValue && d.Count > 0 && dataset.some(existingNode => existingNode[otherKey] === d[otherKey]);
-      });  // Find nodes by column value
-      console.log(`Searching for '${value}' in ${key} within groupedData...`);
-      console.log(groupedData);
-      
-      if (nodesToReAdd.length > 0) {
-          console.log(`Found nodes to re-add:`, nodesToReAdd);  // Debugging: print found nodes
-
-          // Check if the nodes already exist in the dataset
-          const nodeExists = nodesToReAdd.some(d => dataset.some(existingNode => existingNode[key] === d[key]));
-          console.log(`Do any of the nodes already exist in dataset?: ${nodeExists}`);  // Debugging: check if nodes exist in dataset
-
-          if (!nodeExists) {
-              // Add all the found nodes back to dataset
-              dataset.push(...nodesToReAdd);
-              console.log(`Nodes added to dataset. Re-rendering Sankey diagram...`);
-              renderSankey(dataset, col1, col2);  // Re-render the Sankey diagram with updated data
-          } else {
-              alert("Node(s) already exist in the dataset.");
-          }
-      } else {
-          alert(`No node found in the grouped data for ${column}: ${value}`);
-      }
+      addNodeToColumn(column, key, otherKey);
   } else {
       alert(`Please enter a value for ${column}.`);
   }
@@ -572,13 +578,13 @@ d3.csv("terror_cleaned.csv", d3.autoType).then(data => {
       // Handle click event for adding a node to col1
       document.getElementById('addCol1Button').addEventListener('click', function () {
         const col1 = select1.property("value");
-        addNodeToColumn('col1', col1, col2);  // Call function to add to col1
+        addNodeByInput('col1', col1, col2);  // Call function to add to col1
       });
 
       // Handle click event for adding a node to col2
       document.getElementById('addCol2Button').addEventListener('click', function () {
         const col2 = select2.property("value");
-        addNodeToColumn('col2', col2, col1);  // Call function to add to col2
+        addNodeByInput('col2', col2, col1);  // Call function to add to col2
       });
 
       // Initial chart
@@ -590,75 +596,86 @@ d3.csv("terror_cleaned.csv", d3.autoType).then(data => {
     console.error("Error loading the data:", error);
   });
 
-function handleMouseOver(event, d) {
-  console.log("Hover Detected ", d.name);
-  
-  const attackType = d.name;
-  const details = groupedData.filter(item => item.AttackType === attackType);
-
-  if (details.length === 0) {
-    console.log("No details to show on hover");
-    return;
-  }
-  console.log("Details: ", details);
-
-  hoverDetails = d3.select("#hover-details")
-    .on("mouseout", handleMouseOut);  // Hide details when mouse leaves the hover details div
-
-  // Find the maximum count to normalize the bars
-  const maxCount = d3.max(details, d => d.Count);
-  // Sort details by Count, high to low
-  details.sort((a, b) => b.Count - a.Count);
-
-  const nodeRect = event.target.getBoundingClientRect();
-  hoverDetails
-    .style("display", "block")
-    .style("left", (nodeRect.right) + "px")
-    .style("top", (nodeRect.top) + "px")
-    .style("width", `calc(100% - ${nodeRect.right + 20}px)`); // Set the width dynamically
+  function handleMouseOver(event, d) {
+    console.log("Hover Detected ", d.name);
     
+    // Get the value of col2 (the main property like "AttackType")
+    const mainPropertyValue = d.name;  // This is equivalent to the value of col2 (e.g., AttackType: "Facility/Infrastructure Attack")
+    
+    // Filter the groupedData based on col2 and col1
+    const details = groupedData.filter(item => item[col2] === mainPropertyValue);
   
-  hoverDetails.selectAll("*").remove(); // Clear previous content
-
-
-  const labelWidth = 120; // Adjust this width to fit the content appropriately
-
-  details.forEach(detail => {
-    const row = hoverDetails.append("div")
-      .attr("class", "detail-row")
-      .style("display", "flex") // Ensures the items are aligned in a row
-      .style("align-items", "center"); // Vertically align
-
-    // Add checkbox
-    row.append("input")
+    if (details.length === 0) {
+      console.log("No details to show on hover");
+      return;
+    }
+    console.log("Details: ", details);
+  
+    hoverDetails = d3.select("#hover-details")
+      .on("mouseout", handleMouseOut);  // Hide details when mouse leaves the hover details div
+  
+    // Find the maximum count to normalize the bars
+    const maxCount = d3.max(details, d => d.Count);
+    // Sort details by Count, high to low
+    details.sort((a, b) => b.Count - a.Count);
+  
+    const nodeRect = event.target.getBoundingClientRect();
+    hoverDetails
+      .style("display", "block")
+      .style("left", (nodeRect.right) + "px")
+      .style("top", (nodeRect.top) + "px")
+      .style("width", `calc(100% - ${nodeRect.right + 20}px)`); // Set the width dynamically
+  
+    hoverDetails.selectAll("*").remove(); // Clear previous content
+  
+    const labelWidth = 120; // Adjust this width to fit the content appropriately
+  
+    details.forEach(detail => {
+      const row = hoverDetails.append("div")
+        .attr("class", "detail-row")
+        .style("display", "flex") // Ensures the items are aligned in a row
+        .style("align-items", "center"); // Vertically align
+  
+      // Add checkbox
+      row.append("input")
         .attr("type", "checkbox")
-        .style("width", "20px"); // Fixed width for checkbox
-
-    // Add label with fixed width
-    row.append("option")
-        .attr("for", "region-" + detail.Region) // Optional: Add a unique ID for accessibility
-        .text(detail.Region)
-        .style("width", labelWidth + "px") // Set the fixed width for the label
-        .style("white-space", "nowrap") // Prevent label text from wrapping
-        .style("overflow", "hidden") // Hide overflowed text
-        .style("text-overflow", "ellipsis") // Show ellipsis for overflow text
-        .style("display", "flex") // Make label a flex container to vertically align text
-        .style("align-items", "center"); // Vertically center text inside the label
-
-    // Create a wrapper div for the bar that will occupy the remaining space
-    const barWrapper = row.append("div")
-      .style("flex-grow", 1)  // This makes the bar wrapper grow to occupy available space
-      .style("position", "relative"); // Positioning for the bar
-
-    // Create the bar inside the wrapper
-    barWrapper.append("div")
-      .attr("class", "bar")
-      .style("width", (detail.Count / maxCount * 100) + "%") // The width of the bar based on percentage of maxCount
-      .style("height", "20px") // Set a fixed height for the bar
-      .style("background-color", "#3498db") // Bar color
-      .text(detail.Count);
-  });
-}
+        .style("width", "20px") // Fixed width for checkbox
+        .property("checked", dataset.some(d => d[col1] === detail[col1])) // Check the checkbox if the value in col1 matches
+        .on("change", function(event) {
+          // Only call the function when the checkbox is checked (unchecked triggers the removal)
+          if (this.checked) {
+            console.log(`Checkbox checked: ${detail[col1]}`, mainPropertyValue, col1);
+            addNodeToColumn(col1, mainPropertyValue, detail[col1]); // Call with the dynamic parameters
+            
+          }
+        });
+  
+      // Add label with fixed width
+      row.append("label") // Changed from "option" to "label" for correct HTML semantics
+          .attr("for", "region-" + detail[col1]) // Optional: Add a unique ID for accessibility
+          .text(detail[col1]) // Use col1 value for the label
+          .style("width", labelWidth + "px") // Set the fixed width for the label
+          .style("white-space", "nowrap") // Prevent label text from wrapping
+          .style("overflow", "hidden") // Hide overflowed text
+          .style("text-overflow", "ellipsis") // Show ellipsis for overflow text
+          .style("display", "flex") // Make label a flex container to vertically align text
+          .style("align-items", "center"); // Vertically center text inside the label
+  
+      // Create a wrapper div for the bar that will occupy the remaining space
+      const barWrapper = row.append("div")
+        .style("flex-grow", 1)  // This makes the bar wrapper grow to occupy available space
+        .style("position", "relative"); // Positioning for the bar
+  
+      // Create the bar inside the wrapper
+      barWrapper.append("div")
+        .attr("class", "bar")
+        .style("width", (detail.Count / maxCount * 100) + "%") // The width of the bar based on percentage of maxCount
+        .style("height", "20px") // Set a fixed height for the bar
+        .style("background-color", "#3498db") // Bar color
+        .text(detail.Count);
+    });
+  }
+  
 
 function handleMouseOut(event) {
   if (!hoverDetails.node().contains(event.relatedTarget)) {
