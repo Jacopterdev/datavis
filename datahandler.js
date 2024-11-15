@@ -285,15 +285,18 @@ function renderSankey(data) {
 // Function to get top N categories by count along with counts
 function getTopCategories(data, col, topN) {
   const counts = {};
+  //console.log("Data to sort by ", topN, " ", data, " for column: ", col);
 
   data.forEach(row => {
-    if (!counts[row[col]]) {
-      counts[row[col]] = 0;
+    const value = row[col];
+    if (!counts[value]) {
+      counts[value] = 0;
     }
-    counts[row[col]]++;
+    counts[value] += row.Count; // Accumulate the count for this value
   });
 
   const sortedCounts = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+  //console.log("Sorted Top N ", sortedCounts);
   const topCategories = sortedCounts.slice(0, topN).map(d => d[0]);
 
   return { topCategories, counts };
