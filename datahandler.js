@@ -179,13 +179,15 @@ function renderSankey(data) {
   // Bind data to nodes
   const node = svg.selectAll(".node")
     .data(nodes, d => d.name);
+    
 
   // Enter new nodes
   const nodeEnter = node.enter().append("g")
     .attr("class", "node")
     .on("click", function(event, d) {
       handleNodeClick(d);
-    });
+    })
+    .on("mouseover", handleMouseOver);
 
   nodeEnter.append("rect")
     .attr("x", d => d.x0)
@@ -587,3 +589,81 @@ d3.csv("terror_cleaned.csv", d3.autoType).then(data => {
   }).catch(error => {
     console.error("Error loading the data:", error);
   });
+
+function handleMouseOver(event, d) {
+  console.log("Hover Detected ", d.name);
+  
+  const attackType = d.name;
+  const details = groupedData.filter(item => item.AttackType === attackType);
+
+  if (details.length === 0) {
+    console.log("No details to show on hover");
+    return;
+  }
+  console.log("Details: ", details);
+
+  hoverDetails = d3.select("#hover-details")
+    .on("mouseout", handleMouseOut);  // Hide details when mouse leaves the hover details div
+
+  // Find the maximum count to normalize the bars
+  const maxCount = d3.max(details, d => d.Count);
+  // Sort details by Count, high to low
+  details.sort((a, b) => b.Count - a.Count);
+
+  const nodeRect = event.target.getBoundingClientRect();
+  hoverDetails
+    .style("display", "block")
+    .style("left", (nodeRect.right) + "px")
+    .style("top", (nodeRect.top) + "px")
+    .style("width", `calc(100% - ${nodeRect.right + 20}px)`); // Set the width dynamically
+    
+  
+  hoverDetails.selectAll("*").remove(); // Clear previous content
+
+
+  const labelWidth = 120; // Adjust this width to fit the content appropriately
+
+  details.forEach(detail => {
+    const row = hoverDetails.append("div")
+      .attr("class", "detail-row")
+      .style("display", "flex") // Ensures the items are aligned in a row
+      .style("align-items", "center"); // Vertically align
+
+    // Add checkbox
+    row.append("input")
+        .attr("type", "checkbox")
+        .style("width", "20px"); // Fixed width for checkbox
+
+    // Add label with fixed width
+    row.append("option")
+        .attr("for", "region-" + detail.Region) // Optional: Add a unique ID for accessibility
+        .text(detail.Region)
+        .style("width", labelWidth + "px") // Set the fixed width for the label
+        .style("white-space", "nowrap") // Prevent label text from wrapping
+        .style("overflow", "hidden") // Hide overflowed text
+        .style("text-overflow", "ellipsis") // Show ellipsis for overflow text
+        .style("display", "flex") // Make label a flex container to vertically align text
+        .style("align-items", "center"); // Vertically center text inside the label
+
+    // Create a wrapper div for the bar that will occupy the remaining space
+    const barWrapper = row.append("div")
+      .style("flex-grow", 1)  // This makes the bar wrapper grow to occupy available space
+      .style("position", "relative"); // Positioning for the bar
+
+    // Create the bar inside the wrapper
+    barWrapper.append("div")
+      .attr("class", "bar")
+      .style("width", (detail.Count / maxCount * 100) + "%") // The width of the bar based on percentage of maxCount
+      .style("height", "20px") // Set a fixed height for the bar
+      .style("background-color", "#3498db") // Bar color
+      .text(detail.Count);
+  });
+}
+
+function handleMouseOut(event) {
+  if (!hoverDetails.node().contains(event.relatedTarget)) {
+      hoverDetails.style("display", "none");
+      // Remove the mouseout event listener to prevent unnecessary triggers
+      hoverDetails.on("mouseout", null);
+  }
+}
