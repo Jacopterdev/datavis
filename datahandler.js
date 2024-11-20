@@ -305,6 +305,7 @@ function getTopCategories(data, col, topN) {
 }
 
 function handleNodeClick(clickedNode) {
+  console.log("clickedNode: ",clickedNode);
   // Remove clicked node from data
   const newDataset = dataset.filter(row => row[col1] !== clickedNode.name && row[col2] !== clickedNode.name);
 
@@ -339,41 +340,43 @@ function reduceToTopN(data, topN = selectedTopN, includeOther = false) {
   });
 }
 
-function addNodeToColumn(column, key, otherKey) {
-  console.log("Input Value: ", otherKey.toLowerCase(), "Key to lookup: ", key);
-  const value = otherKey;
-  // Loop through groupedData and find the matching entries by column (key)
-  const nodesToReAdd = groupedData.filter(d => {
-    // Trim spaces and handle case insensitivity
-    const dataValue = d[key]?.toLowerCase().trim();
-    const inputValue = value.toLowerCase();
+function addNodeToColumn(column, node) {
+  const otherKey = col2;
+  const key = col1;
+  console.log("Input Value: ", node, dataset);
 
-    // Check if the otherKey exists in the dataset
+  // Find the nodes in groupedData with the same otherKey and ensure otherKey does not already exist in dataset
+  const nodesToAdd = groupedData.filter(d => {
+    const otherKeyMatches = d[key] === node[key];
+    console.log("Finding nodes that match on ", d[key], " ...");
     const otherKeyExists = dataset.some(existingNode => existingNode[otherKey] === d[otherKey]);
+    console.log("Checking that ", d[otherKey], " exists...");
+    return otherKeyMatches && d.Count > 0 && otherKeyExists; // Include only nodes that match and aren't already in dataset
+  });
 
-    return dataValue === inputValue && d.Count > 0 && dataset.some(existingNode => existingNode[otherKey] === d[otherKey]);
-  });  // Find nodes by column value
-  console.log(`Searching for '${value}' in ${key} within groupedData...`);
-  //console.log(groupedData);
+  console.log("Nodes to add: ", nodesToAdd);
 
-  if (nodesToReAdd.length > 0) {
-    console.log(`Found nodes to re-add:`, nodesToReAdd);  // Debugging: print found nodes
+  // Add the matching nodes back to the dataset
+  nodesToAdd.forEach(newNode => dataset.push(newNode));
 
-    // Check if the nodes already exist in the dataset
-    const nodeExists = nodesToReAdd.some(d => dataset.some(existingNode => existingNode[key] === d[key]));
-    console.log(`Do any of the nodes already exist in dataset?: ${nodeExists}`);  // Debugging: check if nodes exist in dataset
+  // Re-render the Sankey diagram with the updated data
+  renderSankey(dataset, col1, col2);
+}
 
-    if (!nodeExists) {
-      // Add all the found nodes back to dataset
-      dataset.push(...nodesToReAdd);
-      console.log(`Nodes added to dataset. Re-rendering Sankey diagram...`);
-      renderSankey(dataset, col1, col2);  // Re-render the Sankey diagram with updated data
-    } else {
-      alert("Node(s) already exist in the dataset.");
-    }
-  } else {
-    alert(`No node found in the grouped data for ${column}: ${value}`);
-  }
+function removeNodeFromColumn(node) {
+  console.log("clickedNode: ", node);
+
+  // Get the value of node[col1] to filter out
+  const valueToRemove = node[col1];
+  console.log("Filtering out nodes with col1 value: ", valueToRemove);
+
+  // Filter out all nodes with the same col1 value
+  const newDataset = dataset.filter(d => d[col1] !== valueToRemove);
+
+  dataset = newDataset;
+
+  // Re-render the Sankey diagram with updated data
+  renderSankey(dataset, col1, col2);
 }
 
 function addNodeByInput(column, key, otherKey) {
@@ -676,8 +679,11 @@ d3.csv("terror_cleaned.csv", d3.autoType).then(data => {
           // Only call the function when the checkbox is checked (unchecked triggers the removal)
           if (this.checked) {
             console.log(`Checkbox checked: ${detail[col1]}`, mainPropertyValue, col1);
-            //addNodeToColumn(col1, mainPropertyValue, detail[col1]); // Call with the dynamic parameters
-            
+            console.log("Detail object: ",  detail);
+            addNodeToColumn(col1, detail);
+          } else {
+            console.log("removing ", detail);
+            removeNodeFromColumn(detail);
           }
         });
   
