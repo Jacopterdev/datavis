@@ -340,7 +340,7 @@ function reduceToTopN(data, topN = selectedTopN, includeOther = false) {
 }
 
 function addNodeToColumn(column, key, otherKey) {
-  console.log(otherKey);
+  console.log("Input Value: ", otherKey.toLowerCase(), "Key to lookup: ", key);
   const value = otherKey;
   // Loop through groupedData and find the matching entries by column (key)
   const nodesToReAdd = groupedData.filter(d => {
@@ -354,7 +354,7 @@ function addNodeToColumn(column, key, otherKey) {
     return dataValue === inputValue && d.Count > 0 && dataset.some(existingNode => existingNode[otherKey] === d[otherKey]);
   });  // Find nodes by column value
   console.log(`Searching for '${value}' in ${key} within groupedData...`);
-  console.log(groupedData);
+  //console.log(groupedData);
 
   if (nodesToReAdd.length > 0) {
     console.log(`Found nodes to re-add:`, nodesToReAdd);  // Debugging: print found nodes
@@ -385,7 +385,38 @@ function addNodeByInput(column, key, otherKey) {
   console.log(`Input value for ${column}: '${value}'`);  // Debugging input value
 
   if (value) {
-      addNodeToColumn(column, key, otherKey);
+      // Loop through groupedData and find the matching entries by column (key)
+      const nodesToReAdd = groupedData.filter(d => {
+          // Trim spaces and handle case insensitivity
+          const dataValue = d[key]?.toLowerCase().trim();
+          const inputValue = value.toLowerCase();
+
+          // Check if the otherKey exists in the dataset
+          const otherKeyExists = dataset.some(existingNode => existingNode[otherKey] === d[otherKey]);
+
+          return dataValue === inputValue && d.Count > 0 && dataset.some(existingNode => existingNode[otherKey] === d[otherKey]);
+      });  // Find nodes by column value
+      console.log(`Searching for '${value}' in ${key} within groupedData...`);
+      console.log(groupedData);
+
+      if (nodesToReAdd.length > 0) {
+          console.log(`Found nodes to re-add:`, nodesToReAdd);  // Debugging: print found nodes
+
+          // Check if the nodes already exist in the dataset
+          const nodeExists = nodesToReAdd.some(d => dataset.some(existingNode => existingNode[key] === d[key]));
+          console.log(`Do any of the nodes already exist in dataset?: ${nodeExists}`);  // Debugging: check if nodes exist in dataset
+
+          if (!nodeExists) {
+              // Add all the found nodes back to dataset
+              dataset.push(...nodesToReAdd);
+              console.log(`Nodes added to dataset. Re-rendering Sankey diagram...`);
+              renderSankey(dataset, col1, col2);  // Re-render the Sankey diagram with updated data
+          } else {
+              alert("Node(s) already exist in the dataset.");
+          }
+      } else {
+          alert(`No node found in the grouped data for ${column}: ${value}`);
+      }
   } else {
       alert(`Please enter a value for ${column}.`);
   }
@@ -645,7 +676,7 @@ d3.csv("terror_cleaned.csv", d3.autoType).then(data => {
           // Only call the function when the checkbox is checked (unchecked triggers the removal)
           if (this.checked) {
             console.log(`Checkbox checked: ${detail[col1]}`, mainPropertyValue, col1);
-            addNodeToColumn(col1, mainPropertyValue, detail[col1]); // Call with the dynamic parameters
+            //addNodeToColumn(col1, mainPropertyValue, detail[col1]); // Call with the dynamic parameters
             
           }
         });
