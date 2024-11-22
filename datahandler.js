@@ -552,10 +552,19 @@ function addTag(text, container, input) {
 
 // Load the data
 d3.csv("terror_cleaned.csv", function(d) {
-  // Iterate over all keys in the row object and convert each value to a string
+  // Apply automatic type interpretation for quantifiable columns
+  var autoTypedRow = d3.autoType(d);
+
+  // Iterate over all keys in the row object
   for (var key in d) {
       if (d.hasOwnProperty(key)) {
-          d[key] = String(d[key]);
+          // If the key is not in the quantifiableColumns list, convert the value to a string
+          if (quantifiableColumns.indexOf(key) === -1) {
+              d[key] = String(d[key]);
+          } else {
+              // Use the auto-typed value for quantifiable columns
+              d[key] = autoTypedRow[key];
+          }
       }
   }
   return d;
