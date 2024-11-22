@@ -551,7 +551,15 @@ function addTag(text, container, input) {
 }
 
 // Load the data
-d3.csv("terror_cleaned.csv", d3.autoType).then(data => {
+d3.csv("terror_cleaned.csv", function(d) {
+  // Iterate over all keys in the row object and convert each value to a string
+  for (var key in d) {
+      if (d.hasOwnProperty(key)) {
+          d[key] = String(d[key]);
+      }
+  }
+  return d;
+}).then(data => {
     dataset = data;
     const originalDataset = dataset;
 
