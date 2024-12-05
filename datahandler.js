@@ -123,12 +123,14 @@ function updateChart(data, newCol1, newCol2, linkAttr, bypassFilter=false) {
     filteredData = filterData(data, getSelectedValues());
   }
   
+  console.log("LinkAttr:", linkAttr, linkAttr.toString());
   console.log("filtereddata:", filteredData);
   // Group and count depending on the link/quantifiable data type
   if (linkAttr === 'Incidents') {
     groupedData = groupAndAggregate(filteredData, 'count');
   } else {
     groupedData = groupAndAggregate(filteredData, 'sum', linkAttr);
+    
   }
 
   // Remove any existing SVG
@@ -464,7 +466,7 @@ function filterData(data, selectedValues) {
   return data.filter(function(d) {
       return Object.keys(selectedValues).every(function(key) {
         //if d[key] == null, skip it:
-        if (d[key] == null) {
+        if (d[key] == null) {  
           return false; // Skip this key
         }  
         
