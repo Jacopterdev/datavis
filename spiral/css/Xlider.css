@@ -1,0 +1,197 @@
+.xlider-stack {
+    position: relative;
+}
+
+.xlider-container {
+    padding: calc(1em + 20px / 2) 34px;
+}
+
+.xlider-container.subslider {
+    box-shadow: 0 0 10px #000, inset 0 0 2px #555;
+    border-radius: 5px;
+    background-color: rgba(255, 255, 255, 0.95);
+    position: fixed;
+    width: 300px;
+    z-index: 2;
+    opacity: 0;
+    padding-top: 2em;
+    padding-bottom: 1.5em;
+}
+
+.xlider-slider {
+    height: 10px;
+    border: 1px solid #D3D3D3;
+    border-radius: 2px;
+    box-shadow: inset 0 1px 1px #F0F0F0, 0 3px 6px -5px #BBB;
+    position: relative;
+    box-sizing: border-box;
+}
+
+.subslider .xlider-slider {
+    height: 4px;
+}
+
+.subslider .xlider-labels {
+    display: none;
+}
+
+.xlider-mark {
+    position: absolute;
+    top: 50%;
+    width: 0px;
+    height: 0px;
+    background-color: red;
+}
+
+.xlider-range {
+    position: absolute;
+    height: 100%;
+    background: #3FB8AF;
+}
+
+.xlider-range.movable {
+    cursor: ew-resize;
+}
+
+.xlider-handle {
+    position: relative;
+    height: 20px;
+    width: 34px;
+    border-radius: 3px;
+    background-color: #FFF;
+    border: 1px solid #D9D9D9;
+    z-index: 1;
+    touch-action: none;
+    box-sizing: border-box;
+    box-shadow: inset 0 0 1px #FFF, inset 0 1px 7px #EBEBEB, 0 3px 6px -3px #BBB;
+}
+
+.xlider-handle.movable {
+    cursor: move;
+}
+
+.align-left .xlider-handle {
+    transform: translate(-100%, -50%);
+}
+
+.align-right .xlider-handle {
+    transform: translate(0, -50%);
+}
+
+.align-center .xlider-handle {
+    transform: translate(-50%, -50%);
+}
+
+.xlider-pin {
+    width: 0;
+    height: 0;
+    position: absolute;
+    pointer-events: none;
+}
+
+.align-left .xlider-pin {
+    left: 100%;
+    top: 50%;
+    transform: translate(calc(-100% - 3px), -50%);
+    border-left: 7px solid #D9D9D9;
+    border-top: 7px solid transparent;
+    border-bottom: 7px solid transparent;
+}
+
+.align-right .xlider-pin {
+    left: 0;
+    top: 50%;
+    transform: translate(3px, -50%);
+    border-right: 7px solid #D9D9D9;
+    border-top: 7px solid transparent;
+    border-bottom: 7px solid transparent;
+}
+
+.align-center .xlider-pin {
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 4px;
+    height: 8px;
+    border-right: 1px solid #D9D9D9;
+    border-left: 1px solid #D9D9D9;
+    box-sizing: border-box;
+}
+
+.xlider-tooltip {
+    position: absolute;
+    color: #BBBBBB;
+    opacity: 0;
+    transition: opacity 200ms;
+    z-index: 10;
+    pointer-events: none;
+    bottom: 100%;
+    white-space: nowrap;
+}
+
+.align-left .xlider-tooltip {
+    right: 0;
+}
+
+.align-right .xlider-tooltip {
+    left: 0;
+}
+
+.align-center .xlider-tooltip {
+    left: 50%;
+    transform: translate(-50%, 0);
+}
+
+.moving .xlider-tooltip {
+    opacity: 1;
+}
+
+.xlider-scale {
+    pointer-events: none;
+    margin-top: 10px;
+    opacity: 0;
+    transition: opacity 200ms;
+}
+
+.hovering .xlider-scale {
+    opacity: 1;
+}
+
+.dragging * {
+    cursor: inherit !important;
+}
+
+.xlider-ticks {
+    position: relative;
+    height: 10px;
+}
+
+.xlider-labels {
+    position: relative;
+}
+
+.xlider-label {
+    position: absolute;
+    white-space: nowrap;
+}
+
+.xlider-tick {
+    position: absolute;
+    border-left: 1px solid #D3D3D3;
+}
+
+.xlider-tick.tick {
+    top: 50%;
+    height: 50%;
+}
+
+.xlider-tick.tack {
+    top: 0%;
+    height: 100%;
+}
+
+.xlider-label-text {
+    position: relative;
+    left: -50%;
+    color: #BBBBBB;
+}

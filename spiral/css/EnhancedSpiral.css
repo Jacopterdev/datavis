@@ -1,0 +1,214 @@
+@charset "utf-8";
+
+body {
+    font-family: Roboto, Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    color: rgb(117, 117, 117);
+    overflow: hidden;
+    background: none;
+}
+
+a {
+    color: #3FB8AF;
+}
+
+:focus {
+    border: none;
+    outline: none;
+}
+
+#vis {
+    position: fixed;
+    top: 0;
+    left: 0;
+}
+
+#info {
+    position: fixed;
+    top: 0;
+    right: 0;
+    white-space: pre;
+    text-align: right;
+    padding: 1em;
+}
+
+input[type="text"] {
+    border: solid 1px #bbb;
+    border-radius: 4px;
+    line-height: 130%;
+    padding: 2px;
+}
+
+.main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    align-content: center;
+    justify-content: space-between;
+    height: 100%;
+    margin-left: 0;
+    will-change: margin-left;
+    transition-duration: .2s;
+    transition-property: margin-left;
+}
+
+.main.shrink {
+    margin-left: 300px;
+}
+
+.ui {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 300px;
+    transform: translateX(0px);
+    height: 100%;
+    min-height: 100%;
+    background: #fafafa;
+    box-shadow: 3px 0 3px 0 #999;
+    will-change: transform;
+    transition-duration: .2s;
+    transition-property: transform;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+}
+
+.ui h4 {
+    padding: 1em;
+    margin: 0;
+    background: #eaeaea;
+    text-align: center;
+    font-size: 21px;
+    font-weight: normal;
+    line-height: 27px;
+}
+
+.ui.hidden {
+    transform: translateX(-310px);
+}
+
+.ui-controls {
+    padding: 1em;
+    overflow-y: auto;
+}
+
+.ui-footer {
+    font-size: small;
+    padding: 1em;
+}
+
+.bars {
+    position: absolute;
+    top: 0;
+    left: 0;
+    padding: 1em;
+    font-size: 21px;
+    line-height: 27px;
+    z-index: 11;
+}
+
+.canvas-container {
+    flex: 1 1 auto;
+    align-self: stretch;
+}
+
+.legend-container {
+    width: calc(100% - 14em);
+    flex: 0 1 auto;
+    overflow: hidden;
+    will-change: height;
+    transition-property: height;
+    transition-duration: .2s;
+}
+
+.legend-container.hidden {
+    height: 0;
+}
+
+.legend-container .colors {
+    height: 2em;
+    background-size: 100%;
+}
+
+.legend-container .ticks {
+    position: relative;
+    height: 0.4em;
+    padding-top: 2px;
+}
+
+.legend-container .tick {
+    position: absolute;
+    height: 0.4em;
+    border-left: 1px solid rgb(117, 117, 117);
+}
+
+.legend-container .labels {
+    position: relative;
+    height: 1em;
+    line-height: 1em;
+    padding-top: 2px;
+}
+
+.legend-container .label {
+    position: absolute;
+    height: 1em;
+}
+
+.range-container {
+    width: calc(100% - 7em);
+    flex: 0 1 auto;
+    z-index: 1;
+}
+
+.param-container {
+    padding: 0.5em 0.5em;
+}
+
+.param-slider {
+    margin-top: 1em;
+    margin-bottom: 1em;
+}
+
+.param-input {
+    width: 30px;
+    float: right;
+}
+
+.param-switch {
+    width: 80px;
+    float: right;
+    margin-top: 0.5ex;
+}
+
+.colorselector {
+    float: right;
+    width: 140px;
+    margin-top: -0.5ex;
+}
+
+.xlider-scale,
+.xlider-tooltip {
+    display: none;
+}
+
+.range-container .xlider-tooltip {
+    display: block;
+    opacity: 1;
+    top: 20px;
+    color: #757575;
+}
+
+.range-container .subslider .xlider-tooltip {
+    top: inherit;
+}
+
+.subslider .xlider-scale,
+.subslider .xlider-tooltip {
+    display: block;
+}
+
+.param-slider .xlider-container:not(.subslider),
+.param-switch .xlider-container:not(.subslider) {
+    padding: 0 1em;
+}

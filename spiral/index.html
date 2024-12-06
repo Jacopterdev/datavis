@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>EnhancedSpiral.js</title>
+    <link rel="icon" href="favicon.png" />
+    <link
+      rel="stylesheet"
+      href="//cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css"
+    />
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto" />
+    <link rel="stylesheet" href="css/Xlider.css" />
+    <link rel="stylesheet" href="css/ColorSelector.css" />
+    <link rel="stylesheet" href="css/EnhancedSpiral.css" />
+    <script src="//code.jquery.com/jquery-2.2.3.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/chroma-js/2.1.0/chroma.min.js"></script>
+    <script src="lib/canvas2svg.js"></script>
+    <script src="lib/Xlider.js"></script>
+    <script src="js/Constants.js"></script>
+    <script src="js/Parameter.js"></script>
+    <script src="js/Animatable.js"></script>
+    <script src="js/ColorMapper.js"></script>
+    <script src="js/ColorSelector.js"></script>
+    <script src="js/Spiral.js"></script>
+    <script src="js/EnhancedSpiral.js"></script>
+    <style>
+      .container {
+          text-align: left;
+          margin: 0;
+      }
+      .navs {
+          display: flex;
+          z-index: 11;
+          justify-content: flex-start;
+          padding-left: 320px;
+      }
+      .navs a {
+          margin: 4px
+      }
+      .navs img {
+          width: 32px;
+          height: 32px;
+          display: block;
+          padding-top: 2px;
+          padding-bottom: 2px;
+      }
+      .navs a:hover {
+          border-radius: 4px;
+          background-color: whitesmoke;
+          transition: background-color 0.3s ease;
+      }
+  </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="navs">
+          <a href="../index.html">
+              <img src="../sankey.svg" alt="Sankey Diagram">
+          </a>
+          <a href="spiral/index.html">
+              <img src="../spiral.svg" alt="Spiral Diagram">
+          </a>
+      </div>
+    </div>
+    <div>
+      <div class="ui">
+        <h4>Spiral</h4>
+        <div>
+          <div id="ui-container" class="ui-controls"></div>
+        </div>
+        <div class="toggles" style="margin-left: 4px; padding-block: 20px">
+          <button
+            id="toggle-incidents"
+            class="toggle active"
+            data-metric="Incidents"
+          >
+            Incidents
+          </button>
+          <button id="toggle-killed" class="toggle" data-metric="Killed">
+            Killed
+          </button>
+          <button id="toggle-wounded" class="toggle" data-metric="Wounded">
+            Wounded
+          </button>
+        </div>
+        <div id="dropdown-container" class="dropdowns">
+          <label for="attackTypeDropdown">Attack Type:</label>
+          <select id="attackTypeDropdown" class="dropdown">
+            <option value="" disabled selected>Choose an option</option>
+          </select>
+
+          <label for="targetTypeDropdown">Target Type:</label>
+          <select id="targetTypeDropdown" class="dropdown">
+            <option value="" disabled selected>Choose an option</option>
+          </select>
+
+          <label for="weaponTypeDropdown">Weapon Type:</label>
+          <select id="weaponTypeDropdown" class="dropdown">
+            <option value="" disabled selected>Choose an option</option>
+          </select>
+
+          <label for="country">Country:</label>
+          <select id="country" class="dropdown">
+            <option value="" disabled selected>Choose an option</option>
+          </select>
+
+          <label for="region">Region:</label>
+          <select id="region" class="dropdown">
+            <option value="" disabled selected>Choose an option</option>
+          </select>
+        </div>
+        <div id="filter-controls">
+          <div style="width: 100%; justify-content: center; display: flex">
+            <button id="applyFiltersButton" class="applyFilters">Apply</button>
+            <button
+              id="reset"
+              style="background-color: gray"
+              class="applyFilters"
+            >
+              Reset
+            </button>
+          </div>
+        </div>
+        <canvas id="chart"></canvas>
+      </div>
+      <main class="main shrink">
+        <div class="canvas-container"></div>
+        <div class="legend-container">
+          <div class="colors"></div>
+          <div class="ticks"></div>
+          <div class="labels"></div>
+        </div>
+        <div class="range-container"></div>
+      </main>
+      <div class="bars"><i class="fa fa-bars"></i></div>
+      <canvas id="vis"></canvas>
+      <div id="info"></div>
+    </div>
+
+    <script>
+      fetch("toggleData.json")
+        .then((response) => response.json())
+        .then((data) => {
+          // Extract unique values for each dropdown
+          const attackTypes = [
+            ...new Set(data.map((item) => item.AttackType)),
+          ].sort();
+          const targetTypes = [
+            ...new Set(data.map((item) => item.Target_type)),
+          ].sort();
+          const weaponTypes = [
+            ...new Set(data.map((item) => item.Weapon_type)),
+          ].sort();
+
+          const countryTypes = [
+            ...new Set(data.map((item) => item.Country)),
+          ].sort();
+
+          const regionTypes = [
+            ...new Set(data.map((item) => item.Region)),
+          ].sort();
+
+          // Populate AttackType dropdown
+          const attackTypeDropdown =
+            document.getElementById("attackTypeDropdown");
+          attackTypes.forEach((type) => {
+            const option = document.createElement("option");
+            option.value = type;
+            option.textContent = type;
+            attackTypeDropdown.appendChild(option);
+          });
+
+          // Populate Target_type dropdown
+          const targetTypeDropdown =
+            document.getElementById("targetTypeDropdown");
+          targetTypes.forEach((type) => {
+            const option = document.createElement("option");
+            option.value = type;
+            option.textContent = type;
+            targetTypeDropdown.appendChild(option);
+          });
+
+          // Populate Weapon_type dropdown
+          const weaponTypeDropdown =
+            document.getElementById("weaponTypeDropdown");
+          weaponTypes.forEach((type) => {
+            const option = document.createElement("option");
+            option.value = type;
+            option.textContent = type;
+            weaponTypeDropdown.appendChild(option);
+          });
+
+          // Populate Weapon_type dropdown
+          const countryDropdown = document.getElementById("country");
+          countryTypes.forEach((type) => {
+            const option = document.createElement("option");
+            option.value = type;
+            option.textContent = type;
+            countryDropdown.appendChild(option);
+          });
+
+          // Populate Weapon_type dropdown
+          const regionDropdown = document.getElementById("region");
+          regionTypes.forEach((type) => {
+            const option = document.createElement("option");
+            option.value = type;
+            option.textContent = type;
+            regionDropdown.appendChild(option);
+          });
+        })
+
+        .catch((error) => {
+          console.error("Error loading data:", error);
+        });
+
+      $(window).load(function () {
+        new EnhancedSpiral();
+      });
+    </script>
+  </body>
+</html>
+
+<style>
+  .toggles {
+    margin-bottom: 20px;
+  }
+
+  .toggle {
+    padding: 10px 20px;
+    margin-right: 1px;
+    border: 1px solid #ccc;
+    background: #f4f4f4;
+    cursor: pointer;
+  }
+  .toggle.active {
+    background: #007bff;
+    color: white;
+    border-color: #007bff;
+  }
+  #dropdown-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 30px;
+    padding: 10px;
+    width: 100%;
+    justify-content: center;
+  }
+
+  label {
+    font-size: 14px;
+    margin-bottom: 1px;
+  }
+
+  .dropdown {
+    padding: 10px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 210px;
+    background-color: #fff;
+  }
+
+  button {
+    padding: 10px 20px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    background-color: #f4f4f4;
+    cursor: pointer;
+    margin-right: 10px;
+    border-radius: 5px;
+  }
+
+  button.active {
+    background-color: #007bff;
+    color: white;
+    border-color: #007bff;
+  }
+
+  button:hover {
+    background-color: #ddd;
+  }
+
+  .applyFilters {
+    background-color: rgb(255, 150, 51);
+    font-weight: bold;
+    color: #fff;
+  }
+
+  .dropdowns {
+    width: 100%;
+    justify-content: center;
+    display: flex;
+  }
+</style>
